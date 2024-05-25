@@ -16,6 +16,7 @@ return new class extends Migration
             $table->decimal('start_money', 9,2);
             $table->decimal('final_money', 9,2)->nullable();
             $table->decimal('profit', 9,2)->nullable();
+            $table->boolean('state')->default(1);
 
             $table->unsignedBigInteger('user_id');
 

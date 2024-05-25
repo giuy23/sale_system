@@ -9,6 +9,7 @@ declare global {
     }
 
     var route: typeof ziggyRoute;
+    var bootstrap: any;
 }
 
 declare module 'vue' {

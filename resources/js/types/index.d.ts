@@ -5,6 +5,18 @@ export interface User {
     email_verified_at: string;
 }
 
+export type Category = {
+  id: number;
+  name: string;
+  description?: string;
+}
+
+export type SubCategory = {
+  id: number;
+  name: string;
+  category_id: number
+}
+
 export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & {
     auth: {
         user: User;

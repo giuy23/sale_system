@@ -1,0 +1,3 @@
+
+
+-> Pagination.vue => Arreglar la paginación cuando sobrepasa los 15 links ya que se deforma

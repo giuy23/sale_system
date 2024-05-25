@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name',180);
             $table->text('description');
-            $table->decimal('price', 8,2);
+            $table->decimal('purchase_price', 8,2);
+            $table->decimal('sale_price', 8,2);
             $table->string('bar_code', 21);
             $table->smallInteger('quantity');
             $table->integer('minimum_quantity')->default(1);

@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\SubCategoryResource;
 use App\Models\SubCategory;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class SubCategoryController extends Controller
 {
@@ -12,7 +14,11 @@ class SubCategoryController extends Controller
      */
     public function index()
     {
-        //
+        $subCategories = SubCategory::paginate(15);
+
+        return Inertia::render('views/SubCategoryView', [
+          'subCategories' => SubCategoryResource::collection($subCategories)
+        ]);
     }
 
     /**

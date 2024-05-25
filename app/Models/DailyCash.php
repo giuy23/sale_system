@@ -11,7 +11,7 @@ class DailyCash extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['start_money', 'final_money', 'profit', 'user_id'];
+    protected $fillable = ['start_money', 'final_money', 'profit', 'state','user_id'];
 
     public function expenses(): HasMany
     {
