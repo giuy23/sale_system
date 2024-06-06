@@ -1,32 +1,62 @@
 <script lang="ts" setup>
 import { ref, watch } from "vue";
 import Layout from "./Partials/Layout.vue";
-import { SubCategory } from "@/types/index";
+import { SubCategory, GetDataWithParams } from "@/types/index";
 import SearchData from "@/Components/common/SearchData.vue";
-import FormSubCategory from "@/Components/SubCategories/FormSubCategory.vue"
-
-const props = defineProps<{
-  subCategories: SubCategory[] | any;
-}>();
+import FormSubCategory from "@/Components/SubCategories/FormSubCategory.vue";
+import Pagination from "@/Components/common/Pagination.vue";
+import SubCategoryList from "@/Components/SubCategories/SubCategoryList.vue";
+import { useSubCategory } from "@/composables/useSubCategory";
 
 const modalIsOpen = ref(false);
 const subCategories = ref<SubCategory[]>();
 const subCategory = ref<SubCategory | null>(null);
-const links = ref();
+const links = ref<Object>();
+const openModal = () => modalIsOpen.value = true;
+const handleResetModal = () => modalIsOpen.value = false;
 
-watch(props.subCategories, (value) => {
-  subCategories.value = value.data;
-  links.value = value.meta.links
-}, {immediate: true})
+const { deleteSubCategorie } = useSubCategory();
 
-const openModal = () => (modalIsOpen.value = true);
-const handleResetModal = () => (modalIsOpen.value = false);
+const props = defineProps<{
+  subCategories: GetDataWithParams;
+}>();
 
-const showSearchedData = (data: any) => {
+watch(
+  props.subCategories,
+  (value) => {
+    subCategories.value = value.data;
+    links.value = value.meta.links;
+  },
+  { immediate: true }
+);
+
+const showSearchedData = (data: GetDataWithParams) => {
   subCategories.value = data.data;
-  links.value = data.links;
+  links.value = data.meta.links;
 };
 
+const handleCreated = (data: SubCategory) => {
+  subCategories.value?.push(data);
+};
+const handleUpdated = (data: SubCategory) => {
+  const findIndex = subCategories.value!.findIndex(({ id }) => id === data.id);
+
+  if (findIndex !== -1) {
+    subCategories.value![findIndex] = data;
+  }
+};
+
+const editCategory = (data: SubCategory) => {
+  subCategory.value = data;
+};
+
+const handleDeleteSubCategory = async (id: number) => {
+  const { success } = await deleteSubCategorie(id);
+  if (success) {
+    const index = subCategories.value!.findIndex((el) => el.id === id);
+    subCategories.value!.splice(index, 1);
+  }
+};
 </script>
 
 <template>
@@ -50,13 +80,27 @@ const showSearchedData = (data: any) => {
       </div>
     </div>
 
-    <SearchData table="subCategory" @data-searched="showSearchedData" />
+    <SearchData
+      table="subCategory"
+      :search-by="['name']"
+      @data-searched="showSearchedData"
+    />
 
     <FormSubCategory
-    :sub-category="subCategory"
-    :reset="modalIsOpen"
-    @reset="handleResetModal"
+      :sub-category="subCategory"
+      :reset="modalIsOpen"
+      @created="handleCreated"
+      @updated="handleUpdated"
+      @reset="handleResetModal"
     />
+
+    <SubCategoryList
+      :sub-categories="subCategories!"
+      @edit="editCategory"
+      @delete="handleDeleteSubCategory"
+    />
+
+    <Pagination :links="links" />
   </Layout>
 </template>
 

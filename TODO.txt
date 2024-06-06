@@ -1,3 +1,6 @@
 
 
 -> Pagination.vue => Arreglar la paginación cuando sobrepasa los 15 links ya que se deforma
+-> Pagination.vue => No traer datos si está en la primera o última página si hace cilck en prev o next
+-> ALL -> ver como hacer para no traer de nuevo los datos cunado hace click a la misma u otra página si ya están cargada
+-> PRODUCT -> ver que hacer si borran a un proveedor ya que el producto no tendrá un id en ese campo

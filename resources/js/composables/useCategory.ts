@@ -29,7 +29,7 @@ export function useCategory() {
       const { data } = await axios<Category>({
         method: "PUT",
         url: route("category.update", payload.id),
-        data: {...payload},
+        data: { ...payload },
       });
       return { success: true, data };
     } catch (error) {

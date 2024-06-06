@@ -1,11 +1,12 @@
 import './bootstrap';
 import '../css/app.css';
 
-import { createApp, h, DefineComponent } from 'vue';
+import { createApp, h, DefineComponent, defineAsyncComponent } from 'vue';
 import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
-import vSelect from 'vue-select';
+// import vSelect from 'vue-select';
+const vSelect = defineAsyncComponent(() =>import('vue-select'))
 import 'vue-select/dist/vue-select.css';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';

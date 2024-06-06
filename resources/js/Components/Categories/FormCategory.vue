@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { Category } from "@/types";
 import { useCategory } from "@/composables/useCategory";
-import { ref, watch, reactive} from "vue";
+import { ref, watch, reactive } from "vue";
 
 const { createCategory, updateCategory } = useCategory();
 const props = defineProps<{
@@ -39,7 +39,7 @@ let categoryForm = reactive({ ...initialCategory });
 const modalRef = ref<HTMLDivElement | null>(null);
 
 const handleSaveCategory = () => {
-    categoryForm.id ? handleEditCategory() : handleCreateCategory();
+  categoryForm.id ? handleEditCategory() : handleCreateCategory();
 };
 
 const handleCreateCategory = async () => {
@@ -59,6 +59,7 @@ const handleEditCategory = async () => {
     return;
   }
 };
+
 const closeModal = () => {
   const modalInstance = bootstrap.Modal.getInstance(modalRef.value!);
   modalInstance?.hide();

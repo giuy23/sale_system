@@ -2,7 +2,7 @@
 import FormCategory from "@/Components/Categories/FormCategory.vue";
 import CategoryList from "@/Components/Categories/CategoryList.vue";
 import Layout from "./Partials/Layout.vue";
-import { Category } from "@/types";
+import { Category, GetDataWithParams } from "@/types";
 import { ref } from "vue";
 import { useCategory } from "@/composables/useCategory";
 import { watch } from "vue";
@@ -11,11 +11,12 @@ import SearchData from "@/Components/common/SearchData.vue";
 
 const { deleteCategory } = useCategory();
 const categories = ref<Category[]>();
-const links = ref();
+const links = ref<object>();
 const category = ref<Category | null>(null);
 const modalIsOpen = ref(false);
+
 const props = defineProps<{
-  categories: Category[] | any;
+  categories: GetDataWithParams;
 }>();
 
 watch(
@@ -53,9 +54,9 @@ const handleDeleteCategory = async (id: number) => {
 const openModal = () => (modalIsOpen.value = true);
 const handleResetModal = () => (modalIsOpen.value = false);
 
-const showSearchedData = (data: any) => {
+const showSearchedData = (data: GetDataWithParams) => {
   categories.value = data.data;
-  links.value = data.links;
+  links.value = data.meta.links;
 };
 </script>
 
@@ -80,7 +81,11 @@ const showSearchedData = (data: any) => {
       </div>
     </div>
 
-    <SearchData table="category" @data-searched="showSearchedData" />
+    <SearchData
+      table="category"
+      :search-by="['name', 'description']"
+      @data-searched="showSearchedData"
+    />
 
     <FormCategory
       :category="category"

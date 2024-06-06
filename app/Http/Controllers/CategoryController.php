@@ -15,22 +15,32 @@ class CategoryController extends Controller
    */
   public function index(Request $request)
   {
-    $query = Category::query();
+    // $query = Category::query();
 
-    if ($request->filled('search')) {
-      $search = $request->input('search');
-      $query->where('name', 'like', '%' . $search . '%')
-        ->orWhere('description', 'like', '%' . $search . '%');
-    }
+    // if ($request->filled('search')) {
+    //   $search = $request->input('search');
+    //   $query->where('name', 'like', '%' . $search . '%')
+    //     ->orWhere('description', 'like', '%' . $search . '%');
+    // }
 
-    $categories = $query->paginate(15);
+    // $categories = $query->paginate(15);
+
+    // if ($request->wantsJson()) {
+    //   return response()->json($categories);
+    // }
+
+    // return Inertia::render('views/CategoryView', [
+    //   'categories' => CategoryResource::collection($categories),
+    // ]);
+
+    $categories = Category::query()->filterData($request)->paginate(15);
 
     if ($request->wantsJson()) {
-      return response()->json($categories);
+      return CategoryResource::collection($categories)->response();
     }
 
     return Inertia::render('views/CategoryView', [
-      'categories' => CategoryResource::collection($categories),
+        'categories' => CategoryResource::collection($categories),
     ]);
   }
 
@@ -50,7 +60,7 @@ class CategoryController extends Controller
   {
     $category = Category::create($request->all());
 
-    return response()->json($category, 201);
+    return response()->json(new CategoryResource($category), 201);
   }
 
   /**
@@ -75,7 +85,7 @@ class CategoryController extends Controller
   public function update(CategoryRequest $request, Category $category)
   {
     $category->update($request->all());
-    return response()->json($category);
+    return response()->json(new CategoryResource($category));
   }
 
   /**

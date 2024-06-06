@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('daily_cashes', function (Blueprint $table) {
             $table->id();
             $table->decimal('start_money', 9,2);
-            $table->decimal('final_money', 9,2)->nullable();
-            $table->decimal('profit', 9,2)->nullable();
+            $table->decimal('final_money', 9,2)->default(0);
+            $table->decimal('profit', 9,2)->default(0);
             $table->boolean('state')->default(1);
 
             $table->unsignedBigInteger('user_id');

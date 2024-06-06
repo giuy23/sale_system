@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DailyCashController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProviderController;
 use App\Http\Controllers\SubCategoryController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -39,7 +41,22 @@ Route::middleware('auth')->group(function () {
 
     Route::controller(SubCategoryController::class)->group(function(){
       Route::get('/sub-categories', 'index')->name('subCategory.index');
+      Route::post('/create-sub-category', 'store')->name('subCategory.create');
+      Route::put('/update-sub-category/{subCategory}', 'update')->name('subCategory.update');
+      Route::delete('/delete-sub-category/{subCategory}', 'destroy')->name('subCategory.delete');
     });
+
+    Route::controller(DailyCashController::class)->group(function(){
+      Route::get('/daily-cash', 'index')->name('dailyCash.index');
+      Route::post('/create-daily-cash', 'store')->name('dailyCash.create');
+      Route::put('/update-daily-cash/{dailyCash}', 'update')->name('dailyCash.update');
+      Route::put('/status-daily-cash/{dailyCash}', 'changeStatus')->name('dailyCash.status');
+      Route::delete('/delete-daily-cash/{dailyCash}', 'destroy')->name('subCategory.delete');
+    });
+
+    // Route::resource('subCategory', SubCategoryController::class);
+    Route::resource('provider', ProviderController::class);
+    Route::resource('product', ProductController::class);
   });
 
 require __DIR__.'/auth.php';

@@ -14,16 +14,16 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('name',180);
-            $table->text('description');
+            $table->text('description')->nullable();
             $table->decimal('purchase_price', 8,2);
             $table->decimal('sale_price', 8,2);
             $table->string('bar_code', 21);
             $table->smallInteger('quantity');
-            $table->integer('minimum_quantity')->default(1);
+            $table->smallInteger('minimum_quantity')->default(1);
             $table->boolean('state')->default(1)->comment('[1=>activo, 2=>inactivo]');
 
-            $table->unsignedBigInteger('user_id')->comment('[Proveedor]');
             $table->unsignedBigInteger('sub_category_id');
+            $table->unsignedBigInteger('provider_id');
 
             $table->timestamps();
         });
