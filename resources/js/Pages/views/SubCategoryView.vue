@@ -12,8 +12,11 @@ const modalIsOpen = ref(false);
 const subCategories = ref<SubCategory[]>();
 const subCategory = ref<SubCategory | null>(null);
 const links = ref<Object>();
-const openModal = () => modalIsOpen.value = true;
-const handleResetModal = () => modalIsOpen.value = false;
+const openModal = () => (modalIsOpen.value = true);
+const closeModal = () => {
+  modalIsOpen.value = false;
+  subCategory.value = null;
+};
 
 const { deleteSubCategorie } = useSubCategory();
 
@@ -91,7 +94,7 @@ const handleDeleteSubCategory = async (id: number) => {
       :reset="modalIsOpen"
       @created="handleCreated"
       @updated="handleUpdated"
-      @reset="handleResetModal"
+      @reset="closeModal"
     />
 
     <SubCategoryList

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('expenses', function (Blueprint $table) {
             $table->id();
             $table->decimal('amount', 9,2);
-            $table->text('description');
+            $table->text('description')->nullable();
 
             $table->unsignedBigInteger('daily_cash_id');
 

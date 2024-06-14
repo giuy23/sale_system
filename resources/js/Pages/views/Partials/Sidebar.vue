@@ -81,6 +81,28 @@ import { Link, usePage } from '@inertiajs/vue3';
               </Link>
             </li>
 
+            <li class="menu-header small text-uppercase">
+              <span class="menu-header-text">Personal</span>
+            </li>
+
+            <li class="menu-item" :class="{ 'active': $page.url === '/user' }">
+              <Link :href="route('user.index')" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-home-circle"></i>
+                <div data-i18n="Daily Cash">Usuarios</div>
+              </Link>
+            </li>
+
+            <li class="menu-item" :class="{ 'active': $page.url === '/client' }">
+              <Link :href="route('client.index')" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-home-circle"></i>
+                <div data-i18n="Daily Cash">Clientes</div>
+              </Link>
+            </li>
+
+            <li class="menu-header small text-uppercase">
+              <span class="menu-header-text">Almacen</span>
+            </li>
+
             <li class="menu-item" :class="{ 'active': $page.url === '/categories' }">
               <Link :href="route('category.index')" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
@@ -103,6 +125,12 @@ import { Link, usePage } from '@inertiajs/vue3';
               <Link :href="route('provider.index')" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
                 <div data-i18n="Product">Proveedores</div>
+              </Link>
+            </li>
+            <li class="menu-item" :class="{ 'active': $page.url === '/shop' }">
+              <Link :href="route('shop.index')" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-home-circle"></i>
+                <div data-i18n="Shop">Ventas</div>
               </Link>
             </li>
 
@@ -145,6 +173,7 @@ import { Link, usePage } from '@inertiajs/vue3';
             <li class="menu-header small text-uppercase">
               <span class="menu-header-text">Ventas</span>
             </li>
+
             <li class="menu-item" :class="{ 'active': $page.url === '/daily-cash' }">
               <Link :href="route('dailyCash.index')" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>

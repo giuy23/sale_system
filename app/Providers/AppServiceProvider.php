@@ -29,20 +29,20 @@ class AppServiceProvider extends ServiceProvider
       $filters = $request->query('searchBy', []);
 
       return $query->where(function ($query) use ($search, $filters) {
-          if (!empty($filters)) {
-              foreach ($filters as $filter) {
-                  if ($filter === 'id') {
-                      $query->orWhere('id', $search);
-                  }
-                  if ($filter === 'name') {
-                      $query->orWhere('name', 'like', '%' . $search . '%');
-                  }
-                  if ($filter === 'description') {
-                      $query->orWhere('description', 'like', '%' . $search . '%');
-                  }
-              }
+        if (!empty($filters)) {
+          foreach ($filters as $filter) {
+            if ($filter === 'id') {
+              $query->orWhere('id', $search);
+            }
+            if ($filter === 'name') {
+              $query->orWhere('name', 'like', '%' . $search . '%');
+            }
+            if ($filter === 'description') {
+              $query->orWhere('description', 'like', '%' . $search . '%');
+            }
           }
+        }
       });
-  });
+    });
   }
 }

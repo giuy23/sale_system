@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 import { useSearch } from "@/composables/useSearch";
-import db from "just-debounce"
+import db from "just-debounce";
 import { GetDataWithParams } from "@/types";
 
 const props = defineProps<{
@@ -16,9 +16,24 @@ const emits = defineEmits<{
 const { getSearchData } = useSearch();
 
 const searchValue = ref("");
+const searchValueHistory = ref<Boolean>(false);
 
-const handleSearchData = db(async() => {
-  if (!searchValue.value) return;
+const getInitialData = async () => {
+  const { success, data } = await getSearchData(props.table, "", []);
+  if (success) {
+    emits("dataSearched", data!);
+  }
+};
+
+const handleSearchData = db(async () => {
+  if (!searchValue.value && searchValueHistory.value) {
+    getInitialData();
+  }
+
+  if (searchValue.value.trim() === "") {
+    searchValueHistory.value = false;
+    return;
+  }
 
   const { success, data } = await getSearchData(
     props.table,
@@ -26,10 +41,10 @@ const handleSearchData = db(async() => {
     props.searchBy
   );
   if (success) {
+    searchValueHistory.value = true;
     emits("dataSearched", data!);
   }
-}, 450)
-
+}, 450);
 </script>
 
 <template>

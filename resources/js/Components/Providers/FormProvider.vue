@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import { Provider } from "@/types/index";
-import { reactive, ref } from "vue";
+import { reactive, ref, watch } from "vue";
 import { useProvider } from "@/composables/useProvider";
-import { watch } from "vue";
 
 const { createProvider, updateProvider } = useProvider();
 
@@ -19,7 +18,7 @@ const emits = defineEmits<{
 
 watch(
   () => props.provider,
-  (value) => {
+  async (value) => {
     providerForm = { ...value! };
   }
 );
@@ -37,11 +36,11 @@ const initialProvider: Provider = {
   document_number: null,
   name_company: "",
   cellphone: 0,
-  // image: "",
 };
 
 const modalRef = ref(false);
 const image = ref();
+const fileInput = ref<HTMLInputElement | null>(null);
 let providerForm = reactive({ ...initialProvider });
 
 const handleSaveProvider = () => {
@@ -64,7 +63,6 @@ const handleCreateProvider = async () => {
   }
 };
 const handleEditProvider = async () => {
-
   const { success, data } = await updateProvider({
     ...providerForm,
     image: image.value,
@@ -79,6 +77,8 @@ const closeModal = () => {
   const modalInstance = bootstrap.Modal.getInstance(modalRef.value!);
   modalInstance?.hide();
   Object.assign(providerForm, { ...initialProvider });
+  image.value = null;
+  fileInput.value!.value = "";
   emits("reset");
 };
 </script>
@@ -121,48 +121,48 @@ const closeModal = () => {
             </div>
             <div class="col-12 mb-3">
               <label for="name_company" class="form-label"
-              >Nombre de la compañia</label
+                >Nombre de la compañia</label
               >
               <input
-              type="text"
-              id="name_company"
-              class="form-control"
-              placeholder="Escriba el nombre"
-              v-model="providerForm.name_company"
-              required
+                type="text"
+                id="name_company"
+                class="form-control"
+                placeholder="Escriba el nombre"
+                v-model="providerForm.name_company"
+                required
               />
             </div>
             <div class="col-12 mb-3">
               <label for="cellphone" class="form-label">N° Celular</label>
               <input
-              type="text"
+                type="text"
                 id="cellphone"
                 class="form-control"
                 placeholder="Escriba el nombre"
                 v-model="providerForm.cellphone"
                 required
-                />
-              </div>
-            </div>
-            <div class="col-12 mb-3">
-              <label for="dni" class="form-label">DNI</label>
-              <input
-                type="text"
-                id="dni"
-                class="form-control"
-                placeholder="Escriba el nombre"
-                v-model="providerForm.document_number"
               />
             </div>
+          </div>
+          <div class="col-12 mb-3">
+            <label for="dni" class="form-label">DNI</label>
+            <input
+              type="text"
+              id="dni"
+              class="form-control"
+              placeholder="Escriba el nombre"
+              v-model="providerForm.document_number"
+            />
+          </div>
           <div class="row g-2">
             <div class="col-12 mb-3">
               <label for="image" class="form-label">Imagen</label>
               <input
+                ref="fileInput"
                 type="file"
                 accept="image/*"
                 id="image"
                 class="form-control"
-                placeholder="Escriba el nombre"
                 @input="handleInputImage"
                 required
               />

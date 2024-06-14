@@ -4,3 +4,10 @@
 -> Pagination.vue => No traer datos si está en la primera o última página si hace cilck en prev o next
 -> ALL -> ver como hacer para no traer de nuevo los datos cunado hace click a la misma u otra página si ya están cargada
 -> PRODUCT -> ver que hacer si borran a un proveedor ya que el producto no tendrá un id en ese campo
+-> DAILYCASH -> crear un filtrador por fecha y exportar a excel
+-> USER & PROVIDER -> Crear una imagen por defecto si no se le manda una imagen
+-> EXPENSE -> Ver si traer el beneficio y el start_amount de la tabla DAILYCASH y poner un gasto que no sobrepase ese monto
+-> ALL -> cambiar el HORARIO UTC (la caja se cerró a las 7:30 pm)
+-> CLIENT -> No traer al cliente con state 0 cuando se realiza la venta
+-> VENTAS -> desabilitar el botón de guardar una vez se hizo click
+-> ALL -> arreglar los delete de las vistas (tomar como ejemplo el CLIENTVIEW)

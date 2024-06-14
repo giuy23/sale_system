@@ -10,7 +10,7 @@ class Expense extends Model
 {
     use HasFactory;
 
-    protected $table = ['amount', 'description', 'daily_cash_id'];
+    protected $fillable = ['amount', 'description', 'daily_cash_id'];
 
     public function dailyCash(): BelongsTo
     {

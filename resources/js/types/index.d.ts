@@ -5,6 +5,21 @@ export interface User {
   email_verified_at: string;
 }
 
+export type UserType = {
+  id: number;
+  name: string;
+  sur_name: string;
+  email: string;
+  document_number: number;
+  cell_phone: number | null;
+  role_id: number;
+
+  password: string,
+  state?: boolean;
+  role?: string;
+  image?: string;
+}
+
 export type MetaLinks = {
   current_page: number;
   from: number;
@@ -61,6 +76,18 @@ export type Product = {
   image?: string,
 }
 
+export type ProductToSell = {
+  id: number,
+  name: string,
+  sale_price: number,
+  quantity: number,
+  image?: string,
+
+  quantitySell?: number,
+  discount?: number,
+  subTotal?: number
+}
+
 export type DailyCash = {
   id: number,
   start_money: number,
@@ -72,6 +99,21 @@ export type DailyCash = {
 
   created_at: string,
   updated_at: string,
+}
+
+export type Client = {
+  id: number,
+  full_name: string,
+  document_number: number,
+  cell_phone: number | null,
+  state?: boolean,
+}
+
+export type Expense = {
+  id: number,
+  amount: number,
+  description: string,
+  daily_cash_id: number,
 }
 
 export type DailyCashCreate = Pick<DailyCash, 'id' | 'start_money' >

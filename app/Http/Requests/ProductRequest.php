@@ -24,13 +24,13 @@ class ProductRequest extends FormRequest
         return [
             'name' => ['required', 'string'],
             'description' => ['nullable', 'string'],
-            'purchase_price' => ['numeric', 'min:0'],
-            'sale_price' => ['numeric', 'min:0'],
+            'purchase_price' => ['numeric', 'numeric', 'min:0'],
+            'sale_price' => ['numeric', 'numeric', 'min:0'],
             'bar_code' => ['required', 'string', 'unique:products,bar_code,'. $this->id],
             'quantity' => ['required', 'integer'],
             'minimum_quantity' => ['nullable', 'integer'],
-            'provider_id' => ['required', 'integer'],
-            'sub_category_id' => ['required', 'integer'],
+            'provider_id' => ['required', 'integer', 'min:1' ],
+            'sub_category_id' => ['required', 'integer', 'min:1' ],
             'image' => ['required', 'image'],
             'images' => ['nullable', 'array','image'],
         ];

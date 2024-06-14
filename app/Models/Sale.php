@@ -19,12 +19,12 @@ class Sale extends Model
       'igv',
       'state',
       'user_id',
-      'seller_id',
+      'client_id',
     ];
 
     public function client(): BelongsTo
     {
-      return $this->belongsTo(User::class);
+      return $this->belongsTo(Client::class);
     }
 
     public function creditSale(): HasOne

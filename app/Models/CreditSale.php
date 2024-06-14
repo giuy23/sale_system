@@ -12,10 +12,11 @@ class CreditSale extends Model
     use HasFactory;
 
     protected $fillable = [
-      'amount_paid',
+      'amount_payable',
       'remaining_amount',
       'description',
-      'is_paid'
+      'is_paid',
+      'sale_id',
     ];
 
     public function paymentHistories(): HasMany

@@ -5,6 +5,7 @@ import { createApp, h, DefineComponent, defineAsyncComponent } from 'vue';
 import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
+import '@/config/axiosInterceptors';
 // import vSelect from 'vue-select';
 const vSelect = defineAsyncComponent(() =>import('vue-select'))
 import 'vue-select/dist/vue-select.css';

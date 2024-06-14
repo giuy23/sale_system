@@ -26,9 +26,9 @@ const deleteProvider = (id: number) => {
         <thead>
           <tr>
             <th>Nombre</th>
+            <th>DNI</th>
             <th>Nombre de Compañia</th>
             <th>Número de Celular</th>
-            <th>DNI</th>
             <th>Imagen</th>
             <th>Acciones</th>
           </tr>
@@ -39,9 +39,9 @@ const deleteProvider = (id: number) => {
               <i class="fab fa-angular fa-lg text-danger me-3"></i>
               <strong>{{ provider.name }}</strong>
             </td>
+            <td>{{ provider.document_number }}</td>
             <td>{{ provider.name_company }}</td>
             <td>{{ provider.cellphone }}</td>
-            <td>{{ provider.document_number }}</td>
             <td>
               <figure>
                 <img

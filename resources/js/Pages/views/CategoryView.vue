@@ -8,6 +8,7 @@ import { useCategory } from "@/composables/useCategory";
 import { watch } from "vue";
 import Pagination from "@/Components/common/Pagination.vue";
 import SearchData from "@/Components/common/SearchData.vue";
+import { confirmDelete, toastSuccess } from "@/Components/utils/toast";
 
 const { deleteCategory } = useCategory();
 const categories = ref<Category[]>();
@@ -29,10 +30,12 @@ watch(
 );
 
 const handleCreated = (data: Category) => {
+  toastSuccess("Categoría creado con éxito");
   categories.value!.push(data);
 };
 
 const handleUpdated = (data: Category) => {
+  toastSuccess("Categoría atualizada con éxito");
   const findIndex = categories.value!.findIndex(({ id }) => id === data.id);
   if (findIndex !== -1) {
     categories.value![findIndex] = data;
@@ -44,10 +47,15 @@ const editCategory = (data: Category) => {
 };
 
 const handleDeleteCategory = async (id: number) => {
-  const success = await deleteCategory(id);
-  if (success) {
-    const index = categories.value!.findIndex((el) => el.id === id);
-    categories.value!.splice(index, 1);
+  const isConfirmed = await confirmDelete();
+
+  if (isConfirmed === true) {
+    const { success } = await deleteCategory(id);
+    if (success === true) {
+      toastSuccess("Categoría eliminado con éxito");
+      const index = categories.value!.findIndex((el) => el.id === id);
+      categories.value!.splice(index, 1);
+    }
   }
 };
 

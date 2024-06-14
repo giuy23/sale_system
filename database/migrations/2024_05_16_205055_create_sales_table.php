@@ -17,10 +17,10 @@ return new class extends Migration
             $table->decimal('discount_total', 9,2);
             $table->decimal('total', 9,2);
             $table->string('igv')->comment('18%');
-            $table->char('state', 1)->comment('[1=>pagado,2=>cancelado,3=>crédito]');
+            $table->char('state', 1)->comment('[1=>Pagado,2=>Anulado,3=>Crédito]');
 
-            $table->unsignedBigInteger('user_id')->comment('cliente');
-            $table->unsignedBigInteger('seller_id');
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('client_id');
 
             $table->timestamps();
         });

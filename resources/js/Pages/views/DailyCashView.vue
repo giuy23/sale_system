@@ -6,13 +6,15 @@ import DailyCashList from "@/Components/DailyCashes/DailyCashList.vue";
 import FormDailyCash from "@/Components/DailyCashes/FormDailyCash.vue";
 import { ref, watch } from "vue";
 import { useDailyCash } from "@/composables/useDailyCash";
+import FormExpense from "@/Components/Expenses/FormExpense.vue";
 
 const dailyCashes = ref<DailyCash[]>();
-const links = ref();
+const links = ref<Object>();
 const ModalIsOpen = ref(false);
 const disabledBtnCreate = ref(false);
+const idExpense = ref<number>();
 
-const { changeStateDailyCash } = useDailyCash()
+const { changeStateDailyCash } = useDailyCash();
 const props = defineProps<{
   dailyCashes: GetDataWithParams;
 }>();
@@ -33,26 +35,30 @@ const handleCreated = (data: DailyCash) => {
   disabledBtnCreate.value = true;
 };
 
-const changeStateCashRegister = async(id: number, state: boolean) => {
+const changeStateCashRegister = async (id: number, state: boolean) => {
   console.log(id, state);
   console.log(!state);
 
-  const { success, data } = await changeStateDailyCash(id, !state)
+  const { success, data } = await changeStateDailyCash(id, !state);
   if (success) {
     const findIndex = dailyCashes.value!.findIndex((el) => el.id === id);
     if (findIndex !== -1) {
-      dailyCashes.value![findIndex] = data!
+      dailyCashes.value![findIndex] = data!;
     }
   }
 };
 
 const verifyCashIsOpenToday = () => {
-  const today = new Date().toISOString().split('T')[0];
-  const cashDate = dailyCashes.value![0].created_at.split(' ')[0];
-  today === cashDate ? disabledBtnCreate.value = true : ''
+  const today = new Date().toISOString().split("T")[0];
+  const cashDate = dailyCashes.value![0].created_at.split(" ")[0];
+  today === cashDate ? (disabledBtnCreate.value = true) : "";
 };
 
 verifyCashIsOpenToday();
+
+const createExpense = (id: number) => {
+  idExpense.value = id;
+};
 </script>
 
 <template>
@@ -80,9 +86,12 @@ verifyCashIsOpenToday();
     <DailyCashList
       :daily-cashes="dailyCashes!"
       @close-cash="changeStateCashRegister"
+      @create-expense="createExpense"
     />
 
     <FormDailyCash :reset="ModalIsOpen" @created="handleCreated" />
+
+    <FormExpense :id-expense="idExpense!" />
 
     <Pagination :links="links" />
   </Layout>

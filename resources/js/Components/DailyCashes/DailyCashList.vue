@@ -1,20 +1,29 @@
 <script lang="ts" setup>
 import { DailyCash } from "@/types";
 import { computed } from "vue";
+import { useExpense } from "@/composables/useExpense";
 
+const { getExpenses } = useExpense();
 const props = defineProps<{
   dailyCashes: DailyCash[];
 }>();
 
 const emits = defineEmits<{
   closeCash: [id: number, state: boolean];
-
+  createExpense: [id: number];
 }>();
 
 const changeStateCashRegister = (id: number, state: boolean) => {
-  console.log(id, state);
   emits("closeCash", id, state);
 };
+
+const createExpense = (id: number) => {
+  emits("createExpense", id);
+};
+
+const redirectViewExpense = (id: number) => {
+  getExpenses(id)
+}
 
 const state = computed(() => (value: boolean) => {
   let tag;
@@ -65,18 +74,42 @@ const state = computed(() => (value: boolean) => {
                   <i class="bx bx-dots-vertical-rounded"></i>
                 </button>
                 <div class="dropdown-menu">
-                  <!-- <a
+                  <a
                     class="dropdown-item"
                     type="button"
                     data-bs-toggle="modal"
-                    data-bs-target="#backDropModal"
-                    @click="changeStateCashRegister(dailyCash.id)"
-                    ><i class="bx bx-edit-alt me-1"></i> Cerrar Caja</a
-                  > -->
-                  <a v-if="dailyCash.state" class="dropdown-item" @click="changeStateCashRegister(dailyCash.id, dailyCash.state)"
+                    data-bs-target="#createExpense"
+                    v-if="dailyCash.state"
+                    @click="createExpense(dailyCash.id)"
+                    ><i class="bx bx-edit-alt me-1"></i> Crear Gasto</a
+                  >
+                  <a
+                    v-if="dailyCash.state"
+                    class="dropdown-item"
+                    @click="
+                      changeStateCashRegister(dailyCash.id, dailyCash.state)
+                    "
                     ><i class="bx bx-trash me-1"></i> Cerrar Caja</a
                   >
-                  <a v-else class="dropdown-item" @click="changeStateCashRegister(dailyCash.id, dailyCash.state)"
+
+                  <a
+                    v-if="dailyCash.state"
+                    class="dropdown-item"
+                    :href="route('expense.index', {id: dailyCash.id})"
+                    ><i class="bx bx-trash me-1"></i> Ver Gastos</a
+                  >
+                  <!-- <a
+                    v-if="dailyCash.state"
+                    class="dropdown-item"
+                    @click="redirectViewExpense(dailyCash.id)"
+                    ><i class="bx bx-trash me-1"></i> Ver Gastos</a
+                  > -->
+                  <a
+                    v-else
+                    class="dropdown-item"
+                    @click="
+                      changeStateCashRegister(dailyCash.id, dailyCash.state)
+                    "
                     ><i class="bx bx-trash me-1"></i> Abrir Caja</a
                   >
                 </div>

@@ -75,10 +75,10 @@ currentDate.value = getCurrentDate(new Date());
         <div class="modal-body">
           <div class="row">
             <div class="col-12 col-md-6 mb-3">
-              <label for="name" class="form-label">Monto Inicial*</label>
+              <label for="start_money" class="form-label">Monto Inicial*</label>
               <input
                 type="number"
-                id="name"
+                id="start_money"
                 class="form-control"
                 placeholder="Escriba el monto"
                 v-model="dailyCashForm.start_money"
@@ -88,10 +88,10 @@ currentDate.value = getCurrentDate(new Date());
               />
             </div>
             <div class="col-12 col-md-6 mb-3">
-              <label for="name" class="form-label">Fecha de Apertura*</label>
+              <label for="date" class="form-label">Fecha de Apertura*</label>
               <input
                 type="date"
-                id="name"
+                id="date"
                 class="form-control"
                 :value="currentDate"
                 disabled

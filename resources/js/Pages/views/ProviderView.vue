@@ -31,8 +31,6 @@ const openModal = () => (modalIsOpen.value = true);
 const handleResetModal = () => (modalIsOpen.value = false);
 
 const showSearchedData = (data: GetDataWithParams) => {
-  console.log(data);
-
   providers.value = data.data;
   links.value = data.meta.links;
 };

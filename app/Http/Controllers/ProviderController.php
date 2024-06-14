@@ -15,7 +15,12 @@ class ProviderController extends Controller
 
   public function index(Request $request)
   {
-    $providers = Provider::query()->filterData($request)->paginate(15);
+    $providers = Provider::query()->filterData($request)
+    ->when($request->filled('search'), function ($query) use ($request) {
+      $search = $request->search;
+      $query->orWhere('document_number', 'like', '%' . $search . '%');
+    })
+    ->paginate(15);
     if ($request->wantsJson()) {
       return ProviderResource::collection($providers)->response();
     }

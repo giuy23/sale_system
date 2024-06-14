@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Traits\ImageTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -11,7 +13,7 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-  use HasFactory, Notifiable;
+  use HasFactory, Notifiable, ImageTrait;
 
   /**
    * The attributes that are mass assignable.
@@ -24,12 +26,14 @@ class User extends Authenticatable
     'name',
     'sur_name',
     'document_number',
-    'cellphone',
-    'address',
+    'cell_phone',
     'name_company',
     'state',
     'role_id',
+    'client_id',
   ];
+
+  public const path = "images/users";
 
   /**
    * The attributes that should be hidden for serialization.
@@ -72,6 +76,10 @@ class User extends Authenticatable
   public function role(): BelongsTo
   {
     return $this->belongsTo(Role::class);
+  }
+  public function client(): BelongsTo
+  {
+    return $this->belongsTo(Client::class);
   }
 
   public function image()

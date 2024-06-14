@@ -11,7 +11,7 @@ import { ref, watch } from "vue";
 const modalIsOpen = ref(false);
 const products = ref<Product[]>();
 const product = ref<Product | null>(null);
-const links = ref();
+const links = ref<Object>();
 
 const { deleteProduct } = useProduct();
 const props = defineProps<{
@@ -28,7 +28,10 @@ watch(
 );
 
 const openModal = () => (modalIsOpen.value = true);
-const closeModal = () => (modalIsOpen.value = false);
+const closeModal = () => {
+  modalIsOpen.value = false
+  product.value = null
+};
 
 const showSearchedData = (data: GetDataWithParams) => {
   products.value = data.data;

@@ -13,10 +13,12 @@ return new class extends Migration
     {
         Schema::create('credit_sales', function (Blueprint $table) {
             $table->id();
-            $table->decimal('amount_paid', 9,2);
+            $table->decimal('amount_payable', 9,2);
             $table->decimal('remaining_amount', 9,2);
             $table->text('description')->nullable();
             $table->boolean('is_paid')->default(0)->comment('[0=>debe,1=>pagado]');
+
+            $table->unsignedBigInteger('sale_id');
             $table->timestamps();
         });
     }

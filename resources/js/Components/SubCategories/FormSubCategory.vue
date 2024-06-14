@@ -33,9 +33,11 @@ let subCategoryForm = reactive({ ...initialSubCategory });
 watch(
   () => props.subCategory,
   async (value) => {
-    Object.assign(subCategoryForm, value);
-    categorieSelected.value = value!.category_id;
-    await getCategoriesVueSelect(value!.category!.id);
+    if (value) {
+      Object.assign(subCategoryForm, value);
+      categorieSelected.value = value!.category_id;
+      await getCategoriesVueSelect(value!.category!.id);
+    }
   }
   // { immediate: true }
 );
@@ -92,7 +94,7 @@ const getCategories = db(async (value: string | number) => {
   if (success) {
     categories.value = data!.data;
   }
-}, 350);
+}, 450);
 
 const getCategoriesVueSelect = async (data: string | number) => {
   let search;

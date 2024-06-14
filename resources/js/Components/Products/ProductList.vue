@@ -27,9 +27,9 @@ const deleteProduct = (id: number) => {
         <thead>
           <tr>
             <th>Nombre</th>
+            <th>Código de Barras</th>
             <th>Precio de compra</th>
             <th>Precio de venta</th>
-            <th>Código de Barras</th>
             <th>Cantidad</th>
             <th>Cantidad Mínima</th>
             <th>Estado</th>
@@ -43,9 +43,9 @@ const deleteProduct = (id: number) => {
               <i class="fab fa-angular fa-lg text-danger me-3"></i>
               <strong>{{ product.name }}</strong>
             </td>
+            <td>{{ product.bar_code }}</td>
             <td>{{ product.purchase_price }}</td>
             <td>{{ product.sale_price }}</td>
-            <td>{{ product.bar_code }}</td>
             <td>{{ product.quantity }}</td>
             <td>{{ product.minimum_quantity }}</td>
             <td>{{ product.state }}</td>

@@ -15,7 +15,15 @@ class SubCategoryController extends Controller
    */
   public function index(Request $request)
   {
-    $subCategories = SubCategory::query()->filterData($request)->paginate(15);
+    $subCategories = SubCategory::query()
+      ->filterData($request)
+      ->when($request->filled('search'), function ($query) use ($request) {
+        $search = $request->search;
+        $query->orWhereHas('category', function ($query) use ($search) {
+          $query->where('name', 'like', '%' . $search . '%');
+        });
+      })
+      ->paginate(15);
 
     if ($request->wantsJson()) {
       // dd($subCategories);

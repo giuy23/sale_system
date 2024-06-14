@@ -18,12 +18,12 @@ return new class extends Migration
             $table->string('name', 80);
             $table->string('sur_name', 80)->nullable();
             $table->string('document_number',20)->unique()->nullable();
-            $table->string('cellphone',20)->nullable();
-            $table->string('address',180)->nullable();
-            $table->string('name_company')->nullable();
+            $table->string('cell_phone',20)->nullable();
+            // $table->string('address',180)->nullable();
             $table->boolean('state')->default(1)->comment('[0=>inactivo,1=>activo]');
 
             $table->unsignedBigInteger('role_id')->default(3);
+            $table->unsignedBigInteger('client_id')->nullable();
 
             $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
