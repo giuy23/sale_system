@@ -1,23 +1,27 @@
 <script lang="ts" setup>
 import { watch, reactive, ref } from "vue";
-import { Expense } from "@/types/index";
+import { Expense, CreateExpense } from "@/types/index";
 import { useExpense } from "@/composables/useExpense";
+import { computed } from "vue";
 
 const { createExpense, updateExpense } = useExpense();
 const props = defineProps<{
-  idExpense?: number;
-  expense: Expense;
+  createExpense?: CreateExpense;
+  expense?: Expense;
 }>();
 
 const emits = defineEmits<{
   reset: [void];
+  created: [Expense];
   updated: [Expense];
 }>();
 
 watch(
-  () => props.idExpense,
+  () => props.createExpense,
   (value) => {
-    expenseForm.daily_cash_id = value!;
+    expenseForm.daily_cash_id = value!.id!;
+    expenseForm.type = value!.type!;
+    console.log(expenseForm);
   }
 );
 
@@ -32,6 +36,7 @@ const initialExpense: Expense = {
   id: 0,
   amount: 0,
   description: "",
+  type: 1,
   daily_cash_id: 0,
 };
 
@@ -52,6 +57,7 @@ const handleSaveExpense = () => {
 const handleCreateExpense = async () => {
   const { success, data } = await createExpense({ ...expenseForm });
   if (success) {
+    emits("created", data!);
     closeModal();
   }
 };
@@ -62,6 +68,13 @@ const handleEditExpense = async () => {
     closeModal();
   }
 };
+
+const titleModal = computed(() => {
+  if (expenseForm.type === 1) {
+    return "Generar Ingreso";
+  }
+  return "Generar Egreso";
+});
 </script>
 
 <template>
@@ -75,7 +88,7 @@ const handleEditExpense = async () => {
     <div class="modal-dialog modal-sm">
       <form class="modal-content" @submit.prevent="handleSaveExpense">
         <div class="modal-header">
-          <h5 class="modal-title" id="backDropModalTitle">Gasto</h5>
+          <h5 class="modal-title" id="backDropModalTitle">{{ titleModal }}</h5>
           <button
             type="button"
             class="btn-close"

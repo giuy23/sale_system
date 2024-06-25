@@ -19,7 +19,7 @@ class ClientResource extends JsonResource
       'full_name' => $this->full_name,
       'document_number' => $this->document_number,
       'cell_phone' => $this->cell_phone,
-      'state' => $this->state ?? 1,
+      'state' => intval($this->state),
     ];
   }
 }

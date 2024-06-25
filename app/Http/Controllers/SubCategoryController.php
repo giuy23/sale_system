@@ -85,7 +85,6 @@ class SubCategoryController extends Controller
   public function destroy(SubCategory $subCategory)
   {
     $subCategory->delete();
-
     return response()->json(['success' => true]);
   }
 }

@@ -180,6 +180,18 @@ import { Link, usePage } from '@inertiajs/vue3';
                 <div data-i18n="Daily Cash">Caja Diaria</div>
               </Link>
             </li>
+            <li class="menu-item" :class="{ 'active': $page.url === '/sale' }">
+              <Link :href="route('sale.index')" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-home-circle"></i>
+                <div data-i18n="Daily Cash">Historial De Ventas</div>
+              </Link>
+            </li>
+            <li class="menu-item" :class="{ 'active': $page.url === '/saleCredit' }">
+              <Link :href="route('saleCredit.index')" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-home-circle"></i>
+                <div data-i18n="Daily Cash">Ventas a Crédito</div>
+              </Link>
+            </li>
             <li class="menu-header small text-uppercase">
               <span class="menu-header-text">Pages</span>
             </li>

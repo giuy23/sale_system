@@ -47,6 +47,7 @@ class ProductController extends Controller
     $product = Product::create($request->all());
     $urlImage = $this->uploadImage($request->image, $product, Product::path, true);
     $product->image = $urlImage;
+    $product['state'] = 1;
 
     return response()->json(new ProductResource($product), 201);
   }
@@ -81,6 +82,15 @@ class ProductController extends Controller
     return response()->json(new ProductResource($product), 201);
   }
 
+  public function changeState(Request $request, Product $product)
+  {
+    $request->validate(['state' => 'required', 'boolean']);
+    $product->update(['state' => $request->state]);
+
+    $productUpdate = Product::find($product->id);
+    return response()->json(new ProductResource($productUpdate));
+  }
+
   /**
    * Remove the specified resource from storage.
    */
@@ -93,15 +103,25 @@ class ProductController extends Controller
 
   public function productsToSell(Request $request)
   {
-
-    $products = Product::when($request->filled('value'), function ($query) use ($request) {
-      $search = $request['value'];
-      $query->where('name', 'like', '%' . $search . '%');
-      $query->orWhere('bar_code', 'like', '%' . $search . '%');
-    })
-      ->where('state', 1)
+    // $products = Product::when($request->filled('value'), function ($query) use ($request) {
+    //   $search = $request['value'];
+    //   $query->where('name', 'like', '%' . $search . '%');
+    //   return $query->orWhere('bar_code', 'like', '%' . $search . '%');
+    // })
+    //   ->where('state', 1)
+    //   ->where('quantity', '>', 0)
+    //   ->get();
+    $products = Product::where('state', 1)
       ->where('quantity', '>', 0)
+      ->when($request->filled('value'), function ($query) use ($request) {
+        $search = $request['value'];
+        // $query->where(function ($query) use ($search) {
+          $query->where('name', 'like', '%' . $search . '%')
+            ->orWhere('bar_code', 'like', '%' . $search . '%');
+        // });
+      })
       ->get();
+
 
     return response()->json(ProductToSellResource::collection($products));
   }

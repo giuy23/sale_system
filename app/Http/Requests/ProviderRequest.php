@@ -23,11 +23,11 @@ class ProviderRequest extends FormRequest
     {
         // 'regex:/^[a-zA-Z0-9]+$/' -> numbers and string
         return [
-          'name' => ['required', 'string'],
-          'document_number' => ['nullable', 'integer', 'digits:8'],
+          'name' => ['required', 'string', 'max:150'],
+          'document_number' => ['nullable', 'integer', 'digits:8', 'unique:providers,document_number,'. $this->id],
           'name_company' => ['required', 'string'],
           'cellphone' => ['required', 'integer', 'digits:9'],
-          'image' => $this->isMethod("PUT") ? ['sometimes', 'image', 'max:4096'] : ['required', 'image', 'max:4096']
+          'image' => ['nullable', 'image', 'max:4096'],
         ];
     }
 }

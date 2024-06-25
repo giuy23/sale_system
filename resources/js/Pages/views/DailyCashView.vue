@@ -1,18 +1,22 @@
 <script lang="ts" setup>
-import { GetDataWithParams, DailyCash } from "@/types";
+import { GetDataWithParams, DailyCash, CreateExpense, Expense } from "@/types";
 import Layout from "./Partials/Layout.vue";
 import Pagination from "@/Components/common/Pagination.vue";
 import DailyCashList from "@/Components/DailyCashes/DailyCashList.vue";
 import FormDailyCash from "@/Components/DailyCashes/FormDailyCash.vue";
+import FormExpense from "@/Components/Expenses/FormExpense.vue";
 import { ref, watch } from "vue";
 import { useDailyCash } from "@/composables/useDailyCash";
-import FormExpense from "@/Components/Expenses/FormExpense.vue";
+import { toastSuccess } from "@/Components/utils/toast";
 
 const dailyCashes = ref<DailyCash[]>();
 const links = ref<Object>();
 const ModalIsOpen = ref(false);
 const disabledBtnCreate = ref(false);
-const idExpense = ref<number>();
+const expense = ref<CreateExpense>({
+  id: 0,
+  type: 1,
+});
 
 const { changeStateDailyCash } = useDailyCash();
 const props = defineProps<{
@@ -56,8 +60,23 @@ const verifyCashIsOpenToday = () => {
 
 verifyCashIsOpenToday();
 
-const createExpense = (id: number) => {
-  idExpense.value = id;
+const createExpense = (id: number, type: number) => {
+  expense.value = { id, type };
+};
+
+const handleCreateExpense = (data: Expense) => {
+  const dailyCash = dailyCashes.value?.find(
+    ({ id }) => id === data.daily_cash_id
+  );
+  if (data.type == 2) {
+    dailyCash!.final_money -= data.amount;
+    dailyCash!.profit = dailyCash!.final_money - dailyCash!.start_money;
+  } else {
+    dailyCash!.final_money += data.amount;
+    dailyCash!.profit = dailyCash!.final_money - dailyCash!.start_money;
+  }
+
+  toastSuccess("Monto actualizado con éxito");
 };
 </script>
 
@@ -91,7 +110,7 @@ const createExpense = (id: number) => {
 
     <FormDailyCash :reset="ModalIsOpen" @created="handleCreated" />
 
-    <FormExpense :id-expense="idExpense!" />
+    <FormExpense :create-expense="expense!" @created="handleCreateExpense" />
 
     <Pagination :links="links" />
   </Layout>

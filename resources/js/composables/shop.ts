@@ -11,10 +11,13 @@ type ProductSold = {
 const products = ref<ProductToSell[]>([]);
 const productsSold = ref<ProductSold[]>([]);
 const customerPayment = ref<number>(0);
+const descriptionDebt = ref<string>();
 const saleType = ref<number>(1);
 const client = ref(0);
 
 const createCashSale = async () => {
+  productsSold.value = [];
+  transformedProducts();
   try {
     const { data } = await axios({
       method: "POST",
@@ -33,6 +36,8 @@ const createCashSale = async () => {
 };
 
 const createCreditSale = async () => {
+  productsSold.value = [];
+  transformedProducts();
   try {
     const { data } = await axios({
       method: "POST",
@@ -42,6 +47,7 @@ const createCreditSale = async () => {
         products: productsSold.value,
         client_id: client.value,
         customerPayment: customerPayment.value,
+        description: descriptionDebt.value,
       },
     });
     return { success: true, data };
@@ -92,13 +98,19 @@ export function shop() {
     }
   );
 
+  const deleteProductToForm = (id: number) => {
+    const findIndex = products.value.findIndex((el) => el.id === id);
+    if (findIndex !== -1) {
+      products.value.splice(findIndex, 1);
+    }
+  };
+
   const saveSale = async () => {
-    transformedProducts();
     const response = { success: true, msg: "" };
 
     if (saleType.value === 1) {
       const { success, data } = await createCashSale();
-      !success ? (response.success = false) : response.msg = data;
+      !success ? (response.success = false) : (response.msg = data.message);
     } else {
       if (client.value === 1) {
         response.success = false;
@@ -106,7 +118,7 @@ export function shop() {
         return response;
       }
       const { success, data } = await createCreditSale();
-      !success ? (response.success = false) : response.msg = data;
+      !success ? (response.success = false) : (response.msg = data.message);
     }
     return response;
   };
@@ -121,6 +133,8 @@ export function shop() {
     total,
     backMoney,
     debtCustomer,
+    descriptionDebt,
     saveSale,
+    deleteProductToForm,
   };
 }

@@ -1,23 +1,36 @@
 <script lang="ts" setup>
-import { UserType } from '@/types';
+import { UserType } from "@/types";
+import { computed } from "vue";
 
-const props =defineProps<{
+const props = defineProps<{
   users: UserType[];
-}>()
+}>();
 
 const emits = defineEmits<{
   edit: [UserType];
-  delete: [number]
-}>()
+  delete: [number];
+  changeState: [id: number, state: boolean];
+}>();
 
 const editUser = (data: UserType) => {
-  emits("edit", data)
-}
+  emits("edit", data);
+};
 
 const deleteUser = (id: number) => {
   emits("delete", id);
-}
+};
 
+const changeState = (id: number, state: boolean) => {
+  emits("changeState", id, state);
+};
+
+const state = computed(() => (value: boolean) => {
+  let tag;
+  value
+    ? (tag = "<span class='text-info fw-bolder'>Activo</span>")
+    : (tag = "<span class='text-danger fw-bolder'>Inactivo</span>");
+  return tag;
+});
 </script>
 
 <template>
@@ -47,12 +60,13 @@ const deleteUser = (id: number) => {
             <td>{{ user.document_number }}</td>
             <td>{{ user.cell_phone }}</td>
             <td>{{ user.role }}</td>
-            <td>{{ user.state }}</td>
+            <td v-html="state( user.state! )"></td>
             <td>
               <figure>
                 <img
                   :src="`storage/images/users/${user.image}`"
-                  alt="imagen del usuario" style="width: 100px;"
+                  alt="imagen del usuario"
+                  style="width: 100px"
                 />
               </figure>
             </td>
@@ -74,6 +88,18 @@ const deleteUser = (id: number) => {
                     @click="editUser(user)"
                     ><i class="bx bx-edit-alt me-1"></i> Editar</a
                   >
+                  <a
+                    v-if="user.state == false"
+                    class="dropdown-item"
+                    @click="changeState(user.id, !user.state)"
+                    ><i class="bx bx-trash me-1"></i> Activar</a
+                  >
+                  <a
+                    v-if="user.state"
+                    class="dropdown-item"
+                    @click="changeState(user.id, !user.state)"
+                    ><i class="bx bx-trash me-1"></i> Desactivar</a
+                  >
                   <a class="dropdown-item" @click="deleteUser(user.id)"
                     ><i class="bx bx-trash me-1"></i> Eliminar</a
                   >
@@ -92,6 +118,4 @@ const deleteUser = (id: number) => {
   </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

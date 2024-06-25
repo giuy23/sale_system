@@ -49,7 +49,7 @@ class DailyCashController extends Controller
       return response()->json(new DailyCashResource($dailyCash), 201);
     }
 
-    return response()->json(['message' => 'Ya haz abierto una caja hoy'], 400);
+    return response()->json(['message' => 'Ya haz abierto una caja hoy'], 404);
 
   }
 

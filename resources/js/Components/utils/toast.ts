@@ -39,11 +39,32 @@ export const toastSuccess = (msg: string) => {
   toast.success(msg);
 };
 
-export const confirmDelete = (): Promise<boolean> => {
+export const toastInfo = (msg: string) => {
+  toast.info(msg);
+};
+
+export const confirmAction = (msg: string): Promise<boolean> => {
   return new Promise((resolve) => {
     Swal.fire({
       title: "¿Estás seguro?",
-      text: "¡No podrás revertir esta acción!",
+      text: msg ?? "Estas seguro de realizar esta acción!",
+      icon: "info",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, continuar",
+      cancelButtonText: "Cancelar",
+    }).then((result) => {
+      resolve(result.isConfirmed);
+    });
+  });
+};
+
+export const confirmDelete = (msg?: string): Promise<boolean> => {
+  return new Promise((resolve) => {
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: msg ?? "¡No podrás revertir esta acción!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",

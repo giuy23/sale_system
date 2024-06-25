@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProviderRequest;
 use App\Http\Resources\ProviderResource;
+use App\Models\Product;
 use App\Models\Provider;
 use App\Traits\ImageTrait;
 use Illuminate\Http\Request;
@@ -16,11 +17,11 @@ class ProviderController extends Controller
   public function index(Request $request)
   {
     $providers = Provider::query()->filterData($request)
-    ->when($request->filled('search'), function ($query) use ($request) {
-      $search = $request->search;
-      $query->orWhere('document_number', 'like', '%' . $search . '%');
-    })
-    ->paginate(15);
+      ->when($request->filled('search'), function ($query) use ($request) {
+        $search = $request->search;
+        $query->orWhere('document_number', 'like', '%' . $search . '%');
+      })
+      ->paginate(15);
     if ($request->wantsJson()) {
       return ProviderResource::collection($providers)->response();
     }
@@ -43,8 +44,13 @@ class ProviderController extends Controller
   public function store(ProviderRequest $request)
   {
     $provider = Provider::create($request->all());
-    $urlImage = $this->uploadImage($request->image, $provider, 'images/providers', false);
-    $provider->image = $urlImage;
+    if ($request->hasFile('image')) {
+      $urlImage = $this->uploadImage($request->image, $provider, 'images/providers', false);
+      $provider->image = $urlImage;
+    } else {
+      $urlImage = $this->createImage($provider, Provider::path);
+      $provider->image = $urlImage;
+    }
 
     return response()->json(new ProviderResource($provider), 201);
   }
@@ -70,6 +76,10 @@ class ProviderController extends Controller
    */
   public function update(ProviderRequest $request, Provider $provider)
   {
+    $idProvider = $provider->id;
+    if ($idProvider === 1) {
+      return response()->json([], 403);
+    }
     $provider->update($request->all());
     if ($request->hasFile('image')) {
       $urlImage = $this->editImage($request->image, $provider, 'images/providers');
@@ -84,6 +94,12 @@ class ProviderController extends Controller
    */
   public function destroy(Provider $provider)
   {
+    $idProvider = $provider->id;
+    if ($idProvider === 1) {
+      return response()->json([], 403);
+    }
+
+    $provider->products()->update(['provider_id' => 0, 'state' => 0]);
     $this->deleteImage($provider, 'images/providers');
     $provider->delete();
 

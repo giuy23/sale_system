@@ -11,7 +11,7 @@ export function useCategory() {
     try {
       const { data } = await axios<Category>({
         method: "POST",
-        url: route("category.create"),
+        url: route("category.store"),
         data: payload,
       });
       return { success: true, data };
@@ -45,7 +45,7 @@ export function useCategory() {
     try {
       await axios<{ success: boolean }>({
         method: "DELETE",
-        url: route("category.delete", id),
+        url: route("category.destroy", id),
       });
       return { success: true };
     } catch (error) {

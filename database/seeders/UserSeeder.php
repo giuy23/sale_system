@@ -24,8 +24,8 @@ class UserSeeder extends Seeder
       'password' => Hash::make('password'),
     ]);
 
-    if (Storage::exists('public' . '/' . User::path)) {
-      Storage::deleteDirectory('public' . '/' . User::path);
+    if (Storage::exists('public/' . User::path)) {
+      Storage::deleteDirectory('public/' . User::path);
     }
     Storage::makeDirectory('public' . '/' . User::path);
 

@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('bar_code', 21);
             $table->smallInteger('quantity');
             $table->smallInteger('minimum_quantity')->default(1);
-            $table->boolean('state')->default(1)->comment('[1=>activo, 2=>inactivo]');
+            $table->boolean('state')->default(1)->comment('[1=>activo, 0=>inactivo]');
 
             $table->unsignedBigInteger('sub_category_id');
             $table->unsignedBigInteger('provider_id');

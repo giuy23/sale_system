@@ -15,6 +15,7 @@ class Provider extends Model
 
   protected $fillable = ['name', 'document_number', 'name_company', 'cellphone'];
 
+  public const path = 'images/providers';
   protected $hidden = ['created_at', 'updated_at'];
   public function products(): HasMany
   {

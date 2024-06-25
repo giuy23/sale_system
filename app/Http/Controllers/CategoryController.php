@@ -15,24 +15,6 @@ class CategoryController extends Controller
    */
   public function index(Request $request)
   {
-    // $query = Category::query();
-
-    // if ($request->filled('search')) {
-    //   $search = $request->input('search');
-    //   $query->where('name', 'like', '%' . $search . '%')
-    //     ->orWhere('description', 'like', '%' . $search . '%');
-    // }
-
-    // $categories = $query->paginate(15);
-
-    // if ($request->wantsJson()) {
-    //   return response()->json($categories);
-    // }
-
-    // return Inertia::render('views/CategoryView', [
-    //   'categories' => CategoryResource::collection($categories),
-    // ]);
-
     $categories = Category::query()->filterData($request)->paginate(15);
 
     if ($request->wantsJson()) {
@@ -40,7 +22,7 @@ class CategoryController extends Controller
     }
 
     return Inertia::render('views/CategoryView', [
-        'categories' => CategoryResource::collection($categories),
+      'categories' => CategoryResource::collection($categories),
     ]);
   }
 
@@ -59,7 +41,6 @@ class CategoryController extends Controller
   public function store(CategoryRequest $request)
   {
     $category = Category::create($request->all());
-
     return response()->json(new CategoryResource($category), 201);
   }
 
@@ -93,8 +74,8 @@ class CategoryController extends Controller
    */
   public function destroy(Category $category)
   {
+    $category->subCategories()->delete();
     $category->delete();
-
     return response()->json(['success' => true]);
   }
 }

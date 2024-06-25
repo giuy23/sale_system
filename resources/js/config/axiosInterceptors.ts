@@ -6,8 +6,6 @@ import {
 
 window.axios.interceptors.response.use(
   (response) => {
-    console.log(response);
-    console.log("xd");
     return response;
   },
   (error) => {
@@ -20,9 +18,15 @@ window.axios.interceptors.response.use(
       errorsValidationToast(errors);
     } else if (status === 404) {
       const message = error.response.data.message;
-      errorBackEndToast("Algo falló, intentelo más tarde");
+      // errorBackEndToast("Algo falló, intentelo más tarde");
+      errorBackEndToast(message);
     } else if (status === 401 || status === 403) {
       errorAuthorizationToast("No tienes permiso para esto");
+    } else if (status === 400) {
+      errorAuthorizationToast("No tienes permiso para esto");
+    }
+     else if (status == 405) {
+      errorBackEndToast("Hubo un error con la URL");
     } else if (status >= 500) {
       errorBackEndToast("Hubo un error inténtelo nuevamente");
     }

@@ -10,7 +10,7 @@ export function useSubCategory() {
     try {
       const { data } =  await axios({
         method: "POST",
-        url: route('subCategory.create'),
+        url: route('subCategory.store'),
         data: payload
       })
       return { success: true, data };
@@ -40,11 +40,11 @@ export function useSubCategory() {
   const deleteSubCategorie = async(id: number) => {
     loading.value = true
     try {
-      const { data } = await axios<{ success: boolean }>({
+      await axios<{ success: boolean }>({
         method: "DELETE",
-        url: route('subCategory.delete', id)
+        url: route('subCategory.destroy', id)
       })
-      return { success: true, data };
+      return { success: true };
     } catch (error) {
       return { success: false };
     } finally {

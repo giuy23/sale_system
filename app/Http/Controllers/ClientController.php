@@ -32,6 +32,7 @@ class ClientController extends Controller
   public function store(ClientRequest $request)
   {
     $client = Client::create($request->all());
+    $client['state'] = 1;
 
     return response()->json(new ClientResource($client), 201);
   }
@@ -48,6 +49,15 @@ class ClientController extends Controller
     return response()->json(new ClientResource($client), 201);
   }
 
+  public function changeState(Request $request, Client $client)
+  {
+    $request->validate(['state' => ['required', 'boolean']]);
+    $client->update(['state' => $request->state]);
+    $updateClient = Client::find($client->id);
+
+    return response()->json(new ClientResource($updateClient));
+  }
+
   public function destroy(Client $client)
   {
     $idClient = $client->id;
@@ -58,5 +68,18 @@ class ClientController extends Controller
     $client->delete();
 
     return response()->json(['success' => true]);
+  }
+
+  public function clientsToSell(Request $request)
+  {
+    $clients = Client::select(['id', 'full_name', 'document_number'])->where('state', 1)
+      ->when($request->filled('value'), function ($query) use ($request) {
+        $search = $request['value'];
+        $query->where('full_name', 'like', '%' . $search . '%')
+          ->orwhere('document_number', 'like', '%' . $search . '%');
+      })
+      ->get();
+
+    return response()->json($clients, 200);
   }
 }

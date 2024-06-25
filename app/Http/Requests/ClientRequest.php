@@ -22,10 +22,10 @@ class ClientRequest extends FormRequest
   public function rules(): array
   {
     return [
-      'full_name' => ['required', 'string'],
+      'full_name' => ['required', 'string', 'max:160'],
       'document_number' => ['required', 'numeric', 'digits:8', 'unique:clients,document_number,' . $this->id],
       'cell_phone' => ['nullable', 'numeric', 'digits:9'],
-      'state' => ['nullable', 'boolean']
+      'state' => ['nullable', 'boolean'],
     ];
   }
 }

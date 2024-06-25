@@ -17,8 +17,8 @@ class ProductToSellResource extends JsonResource
         return [
           'id' => $this->id,
           'name' => $this->name,
-          'sale_price' => $this->sale_price,
-          'quantity' => $this->quantity,
+          'sale_price' => floatval($this->sale_price),
+          'quantity' => intval($this->quantity),
           'image' => $this->image->url,
         ];
     }

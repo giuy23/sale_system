@@ -47,12 +47,14 @@ const editCategory = (data: Category) => {
 };
 
 const handleDeleteCategory = async (id: number) => {
-  const isConfirmed = await confirmDelete();
+  const isConfirmed = await confirmDelete(
+    "Al borrar una categoría eliminarás también las subcategorías"
+  );
 
   if (isConfirmed === true) {
     const { success } = await deleteCategory(id);
     if (success === true) {
-      toastSuccess("Categoría eliminado con éxito");
+      toastSuccess("Categoría eliminada con éxito");
       const index = categories.value!.findIndex((el) => el.id === id);
       categories.value!.splice(index, 1);
     }

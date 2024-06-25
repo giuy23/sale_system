@@ -7,14 +7,14 @@ import UserList from "@/Components/Users/UserList.vue";
 import { useUser } from "@/composables/useUser";
 import FormUser from "@/Components/Users/FormUser.vue";
 import SearchData from "@/Components/common/SearchData.vue";
-import { confirmDelete, toastSuccess } from "@/Components/utils/toast";
+import { confirmAction, confirmDelete, toastSuccess } from "@/Components/utils/toast";
 
 const users = ref<UserType[]>();
 const user = ref<UserType | null>(null);
 const links = ref<Object>();
 const modalIsOpen = ref(false);
 
-const { deleteUser } = useUser();
+const { deleteUser, changeState } = useUser();
 const props = defineProps<{
   users: GetDataWithParams;
 }>();
@@ -52,11 +52,26 @@ const editUser = (data: UserType) => {
   user.value = data;
 };
 
-const handleDeleteUser = async (id: number) => {
-  const isConfirmed = confirmDelete();
-  if (isConfirmed === true) {
-    const { success } = await deleteUser(id);
+const handleChangeState = async (id: number, state: boolean) => {
+  const isConfirmed = await confirmAction();
+  console.log(isConfirmed);
 
+  if (isConfirmed === true) {
+    const { success, data } = await changeState(id, state);
+    if (success) {
+      toastSuccess("Usuario actualizado con éxito");
+      const finIndex = users.value?.findIndex((el) => el.id === id);
+      if (finIndex !== -1) {
+        users.value![finIndex!] = data!;
+      }
+    }
+  }
+};
+
+const handleDeleteUser = async (id: number) => {
+  const isConfirmed = await confirmDelete();
+  if (isConfirmed) {
+    const { success } = await deleteUser(id);
     if (success === true) {
       toastSuccess("Usuario eliminado con éxito");
       const finIndex = users.value?.findIndex((el) => el.id === id);
@@ -73,7 +88,7 @@ const handleDeleteUser = async (id: number) => {
     <div class="row mb-3">
       <div class="col-12 col-md-10">
         <h4 class="fw-bold py-1 py-md-3">
-          <span class="text-muted fw-light"> / </span> Proveedores
+          <span class="text-muted fw-light"> / </span> Usuarios
         </h4>
       </div>
       <div class="col-12 col-md-2">
@@ -84,7 +99,7 @@ const handleDeleteUser = async (id: number) => {
           data-bs-toggle="modal"
           data-bs-target="#backDropModal"
         >
-          Crear Proveedor
+          Crear Usuario
         </button>
       </div>
     </div>
@@ -103,7 +118,12 @@ const handleDeleteUser = async (id: number) => {
       @reset="handleResetModal"
     />
 
-    <UserList :users="users!" @edit="editUser" @delete="handleDeleteUser" />
+    <UserList
+      :users="users!"
+      @edit="editUser"
+      @delete="handleDeleteUser"
+      @change-state="handleChangeState"
+    />
 
     <Pagination :links="links" />
   </Layout>

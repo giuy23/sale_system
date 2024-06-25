@@ -21,6 +21,22 @@ export function useClient() {
     }
   };
 
+  const changeState = async (id: number, state: boolean) => {
+    loading.value = true;
+    try {
+      const { data } = await axios<Client>({
+        method: "PUT",
+        url: route("client.changeState", id),
+        data: { state },
+      });
+      return { success: true, data };
+    } catch (error) {
+      return { success: false };
+    } finally {
+      loading.value = false;
+    }
+  };
+
   const updateClient = async (payload: Client) => {
     loading.value = true;
     try {
@@ -57,5 +73,6 @@ export function useClient() {
     createClient,
     updateClient,
     deleteClient,
+    changeState,
   };
 }

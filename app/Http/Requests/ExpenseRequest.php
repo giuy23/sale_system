@@ -25,6 +25,7 @@ class ExpenseRequest extends FormRequest
            'amount' => ['required', 'min:0', 'numeric'],
            'description' => ['nullable', 'string'],
            'daily_cash_id' => ['required', 'numeric'],
+           'type' => ['required', 'integer'],
         ];
     }
 }

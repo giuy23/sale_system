@@ -28,7 +28,7 @@ class ProductSeeder extends Seeder
 
 
     foreach ($providers as $provider) {
-      $products = Product::factory(2)->create([
+      $products = Product::factory(6)->create([
         'sub_category_id' => $subCategories->random()->id,
         'provider_id' => $provider->id,
       ]);
@@ -39,8 +39,7 @@ class ProductSeeder extends Seeder
         $imageName = Str::random(8) . '.jpg';
         Storage::put('public/' . Product::path . '/' . $imageName, $imageData);
 
-
-        for ($i = 0; $i < 2; $i++) {
+        for ($i = 0; $i < 1; $i++) {
           Image::factory()->create([
             'url' => $imageName,
             'imageable_type' => Product::class,

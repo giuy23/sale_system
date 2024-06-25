@@ -46,12 +46,13 @@ const deleteProvider = (id: number) => {
               <figure>
                 <img
                   :src="`storage/images/providers/${provider.image}`"
-                  alt="imagen del proveedor" style="width: 100px;"
+                  alt="imagen del proveedor"
+                  style="width: 100px"
                 />
               </figure>
             </td>
             <td>
-              <div class="dropdown">
+              <div v-if="provider.id !== 1" class="dropdown">
                 <button
                   type="button"
                   class="btn p-0 dropdown-toggle hide-arrow"

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { Client } from "@/types";
+import { computed } from "vue";
 
 const props = defineProps<{
   clients: Client[];
@@ -8,6 +9,7 @@ const props = defineProps<{
 const emits = defineEmits<{
   edit: [Client];
   delete: [number];
+  changeState: [id: number, state: boolean];
 }>();
 
 const editclient = (data: Client) => {
@@ -17,6 +19,18 @@ const editclient = (data: Client) => {
 const deleteclient = (id: number) => {
   emits("delete", id);
 };
+
+const changeState = (id: number, state: boolean) => {
+  emits("changeState", id, state);
+};
+
+const state = computed(() => (value: boolean) => {
+  let tag;
+  value
+    ? (tag = "<span class='text-info fw-bolder'>Activo</span>")
+    : (tag = "<span class='text-danger fw-bolder'>Inactivo</span>");
+  return tag;
+});
 </script>
 
 <template>
@@ -41,9 +55,9 @@ const deleteclient = (id: number) => {
             </td>
             <td>{{ client.document_number }}</td>
             <td>{{ client.cell_phone }}</td>
-            <td>{{ client.state }}</td>
+            <td v-html="state( client.state! )"></td>
             <td>
-              <div class="dropdown">
+              <div class="dropdown" v-if="client.id !== 1">
                 <button
                   type="button"
                   class="btn p-0 dropdown-toggle hide-arrow"
@@ -60,6 +74,18 @@ const deleteclient = (id: number) => {
                     @click="editclient(client)"
                     ><i class="bx bx-edit-alt me-1"></i> Editar</a
                   >
+                  <a
+                    v-if="client.state == false"
+                    class="dropdown-item"
+                    @click="changeState(client.id, !client.state)"
+                    ><i class="bx bx-trash me-1"> Activar</i>
+                  </a>
+                  <a
+                    v-if="client.state"
+                    class="dropdown-item"
+                    @click="changeState(client.id, !client.state)"
+                    ><i class="bx bx-trash me-1"> </i>Desactivar
+                  </a>
                   <a class="dropdown-item" @click="deleteclient(client.id)"
                     ><i class="bx bx-trash me-1"></i> Eliminar</a
                   >

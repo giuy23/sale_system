@@ -1,45 +1,44 @@
 <script lang="ts" setup>
-import { ref } from "vue";
-import { Client } from "@/types";
-import { useSearch } from "@/composables/useSearch";
+import { ref, computed } from "vue";
+import { ClientToSell, Client } from "@/types";
 import { shop } from "@/composables/shop";
 import FormClient from "../Clients/FormClient.vue";
 import db from "just-debounce";
+import { toastInfo, toastSuccess } from "../utils/toast";
+import { useSearchToSell } from "@/composables/useSearchToSell";
 
-const clients = ref<Client[]>();
+// const clients = ref<Client[]>();
 const modalRefShop = ref<HTMLDivElement | null>(null);
 
-const { client, backMoney, debtCustomer, saleType, customerPayment, saveSale } =
-  shop();
-const { getSearchData } = useSearch();
+const {
+  client,
+  backMoney,
+  debtCustomer,
+  saleType,
+  customerPayment,
+  descriptionDebt,
+  saveSale,
+} = shop();
+
+const { searchClient, clients } = useSearchToSell();
 const props = defineProps<{
   total: number;
 }>();
 
 const getClients = db(async (value: string | number) => {
-  clients.value = [];
-  const { success, data } = await getSearchData("client", value, [
-    "full_name",
-    "id",
-    "document_number",
-  ]);
-  if (success) {
-    clients.value = data!.data;
-    console.log(clients.value);
-  }
+  await searchClient(value);
 }, 450);
 
 const getInitialClient = db(async () => {
-  const { success, data } = await getSearchData("client", 1, ["id"]);
+  const { success } = await searchClient("00000000");
   if (success) {
-    client.value = data!.data[0].id;
-    clients.value = data!.data;
+    client.value = clients!.value![0].id;
   }
 }, 450);
 
 getInitialClient();
 
-const handleSelected = ({ id }: Client) => {
+const handleSelected = ({ id }: ClientToSell) => {
   client.value = id;
 };
 
@@ -52,17 +51,14 @@ const getClientsVueSelect = async (data: string | number) => {
 };
 
 const handleCreatedClient = (data: Client) => {
-  console.log(data);
   clients.value!.push(data);
   client.value = data.id;
-  console.log(client.value);
 };
 
 const handleCreateShop = async () => {
   const { success, msg } = await saveSale();
-  if (msg) {
-    console.log(msg);
-  }
+  if (success === false && msg !== "") return toastInfo(msg);
+  if (success === true) toastSuccess(msg);
 };
 
 const handleOpenModalShop = () => {
@@ -73,6 +69,20 @@ const closeModal = () => {
   const clientModal = bootstrap.Modal.getInstance(modalRefShop.value);
   clientModal.hide();
 };
+
+const textSaleType = computed(() => {
+  if (saleType.value === 1) {
+    return {
+      color: "text-success",
+      text: "Normal",
+    };
+  } else if (saleType.value === 3) {
+    return {
+      color: "text-info",
+      text: "Crédito",
+    };
+  }
+});
 </script>
 
 <template>
@@ -107,12 +117,17 @@ const closeModal = () => {
         </div>
         <div class="modal-body">
           <div class="row">
-            <div class="row mb-3">
-              <label>Tipo de venta </label>
-              <div class="col-6">
+            <div class="row mb-3 text-center">
+              <label class="form-label fw-bolder"
+                >Tipo de venta
+                <strong :class="textSaleType?.color">{{
+                  textSaleType?.text
+                }}</strong>
+              </label>
+              <div class="col-6 d-flex justify-content-center">
                 <div class="btn btn-primary" @click="saleType = 1">Venta</div>
               </div>
-              <div class="col-6">
+              <div class="col-6 d-flex justify-content-center">
                 <div class="btn btn-info" @click="saleType = 3">Crédito</div>
               </div>
             </div>
@@ -122,8 +137,8 @@ const closeModal = () => {
                 <v-select
                   class="form-control p-0"
                   :options="clients"
-                  :getOptionLabel="(data: Client) => data.full_name"
-                  :reduce="(data: Client) => data.id"
+                  :getOptionLabel="(data: ClientToSell) => data.full_name + ' - ' + data.document_number"
+                  :reduce="(data: ClientToSell) => data.id"
                   :clearable="false"
                   v-model="client"
                   @option:selected="handleSelected"
@@ -142,6 +157,15 @@ const closeModal = () => {
                   </template>
                 </v-select>
               </div>
+            </div>
+            <div v-if="saleType === 3" class="col-12 mb-3">
+              <label for="start_money" class="form-label">Descripción</label>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Indique una descripción"
+                v-model="descriptionDebt"
+              />
             </div>
             <div class="row">
               <div class="col-12">

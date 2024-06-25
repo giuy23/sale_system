@@ -12,7 +12,7 @@ return new class extends Migration {
   {
     Schema::create('clients', function (Blueprint $table) {
       $table->id();
-      $table->string('full_name', 200);
+      $table->string('full_name', 160);
       $table->string('document_number', 21);
       $table->string('cell_phone')->nullable();
       $table->boolean('state')->default(1);

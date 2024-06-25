@@ -10,15 +10,15 @@ const props = defineProps<{
 
 const emits = defineEmits<{
   closeCash: [id: number, state: boolean];
-  createExpense: [id: number];
+  createExpense: [id: number, type: number];
 }>();
 
 const changeStateCashRegister = (id: number, state: boolean) => {
   emits("closeCash", id, state);
 };
 
-const createExpense = (id: number) => {
-  emits("createExpense", id);
+const createExpense = (id: number, type: number) => {
+  emits("createExpense", id, type);
 };
 
 const redirectViewExpense = (id: number) => {
@@ -80,8 +80,17 @@ const state = computed(() => (value: boolean) => {
                     data-bs-toggle="modal"
                     data-bs-target="#createExpense"
                     v-if="dailyCash.state"
-                    @click="createExpense(dailyCash.id)"
-                    ><i class="bx bx-edit-alt me-1"></i> Crear Gasto</a
+                    @click="createExpense(dailyCash.id, 1)"
+                    ><i class="bx bx-edit-alt me-1"></i> Crear Ingreso</a
+                  >
+                  <a
+                    class="dropdown-item"
+                    type="button"
+                    data-bs-toggle="modal"
+                    data-bs-target="#createExpense"
+                    v-if="dailyCash.state"
+                    @click="createExpense(dailyCash.id, 2)"
+                    ><i class="bx bx-edit-alt me-1"></i> Crear Egreso</a
                   >
                   <a
                     v-if="dailyCash.state"

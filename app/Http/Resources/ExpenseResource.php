@@ -16,8 +16,9 @@ class ExpenseResource extends JsonResource
     {
         return [
           'id' => $this->id,
-          'amount' => number_format($this->amount, 2),
+          'amount' => floatval($this->amount),
           'description' => $this->description,
+          'type' => intval($this->type),
           'daily_cash_id' => $this->daily_cash_id,
         ];
     }

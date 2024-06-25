@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Services\DailyCashService;
 use App\Http\Services\ShopService;
 use App\Models\DailyCash;
 use Carbon\Carbon;
@@ -12,26 +13,29 @@ class ShopController extends Controller
 {
   public function __construct(
     private ShopService $shopService,
+    private DailyCashService $dailyCashService,
   ) {
   }
   public function index()
   {
-    $currentDate = Carbon::today();
-    $cashIsOpen = DailyCash::whereDate('created_at', $currentDate)->first();
-
-    if (!$cashIsOpen) {
-      return response()->json(['error' => 'No tienes una caja abierta'], 400);
+    $dailyCashCurrent = $this->dailyCashService->searchDailyCashCurrent();
+    if (!$dailyCashCurrent) {
+      return redirect()->route('dailyCash.index');
+    } else {
+      return Inertia::render('views/ShopView');
     }
-
-    return Inertia::render('views/ShopView');
   }
 
   public function createSale(Request $request)
   {
-    $saleType =  $request['saleType'];
+    $saleType = $request['saleType'];
     $products = $request['products'];
 
     $productsWithPrice = $this->shopService->getProductsToSale($products);
+    if (isset($productsWithPrice['error'])) {
+      return response()->json(['message' => $productsWithPrice['error']], 404);
+    }
+
     $totalAmount = $this->shopService->calculateTotalAmountSale($productsWithPrice);
 
     $sale = $this->shopService->saveShopInTableSale($totalAmount, $saleType, $request['client_id']);
@@ -40,8 +44,10 @@ class ShopController extends Controller
       if ($success) {
         if ($saleType === 3) {
           $this->shopService->saveShopInCreditSale($totalAmount, $sale['id'], $request['customerPayment'], $request['description']);
+        } else {
+          $this->dailyCashService->increaseCashAmountCurrent($totalAmount['total']);
         }
-        $this->shopService->discpuntQuantityProducts($productsWithPrice);
+        $this->shopService->discountQuantityProducts($productsWithPrice);
         return response()->json(['message' => 'Venta creada con éxito.'], 200);
       } else {
         return response()->json(['message' => 'Error al guardar el detalle de la venta.'], 500);

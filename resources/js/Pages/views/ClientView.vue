@@ -8,9 +8,9 @@ import ClientList from "@/Components/Clients/ClientList.vue";
 import Pagination from "@/Components/common/Pagination.vue";
 import { watch } from "vue";
 import { useClient } from "@/composables/useClient";
-import { confirmDelete, toastSuccess } from "@/Components/utils/toast";
+import { confirmAction, confirmDelete, toastSuccess } from "@/Components/utils/toast";
 
-const { deleteClient } = useClient();
+const { changeState, deleteClient } = useClient();
 const modalIsOpen = ref(false);
 const links = ref();
 const client = ref<Client | null>(null);
@@ -55,8 +55,24 @@ const editClient = (data: Client) => {
   client.value = data;
 };
 
+const handleChangeState = async(id: number, state: boolean) => {
+  const isConfirmed = await confirmAction();
+  console.log(isConfirmed);
+
+  if (isConfirmed === true) {
+    const { success, data } = await changeState(id, state);
+    if (success) {
+      toastSuccess("Cliente actualizado con éxito");
+      const finIndex = clients.value?.findIndex((el) => el.id === id);
+      if (finIndex !== -1) {
+        clients.value![finIndex!] = data!;
+      }
+    }
+  }
+}
+
 const handleDeleteClient = async (id: number) => {
-  const isConfirmed = confirmDelete();
+  const isConfirmed = await confirmDelete();
   if (isConfirmed === true) {
     const { success } = await deleteClient(id);
 
@@ -110,6 +126,7 @@ const handleDeleteClient = async (id: number) => {
       :clients="clients!"
       @edit="editClient"
       @delete="handleDeleteClient"
+      @change-state="handleChangeState"
     />
 
     <Pagination :links="links" />

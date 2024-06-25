@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use Illuminate\Support\Facades\Storage;
+use Laravolt\Avatar\Facade as Avatar;
 
 trait ImageTrait
 {
@@ -46,4 +47,18 @@ trait ImageTrait
     return true;
   }
 
+
+  public function createImage($model, $path)
+  {
+    $avatar = Avatar::create($model->name)->getImageObject()->encode('png');
+    $imageName = time() . '.png';
+    Storage::disk('public')->put($path . '/' . $imageName, (string) $avatar);
+    // Storage::disk('public')->putFileAs($path, $avatar, $imageName);
+
+    $model->image()->create([
+      'url' => $imageName,
+    ]);
+
+    return $imageName;
+  }
 }

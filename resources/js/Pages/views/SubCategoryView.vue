@@ -7,7 +7,9 @@ import FormSubCategory from "@/Components/SubCategories/FormSubCategory.vue";
 import Pagination from "@/Components/common/Pagination.vue";
 import SubCategoryList from "@/Components/SubCategories/SubCategoryList.vue";
 import { useSubCategory } from "@/composables/useSubCategory";
+import { confirmDelete, toastSuccess } from "@/Components/utils/toast";
 
+const { deleteSubCategorie } = useSubCategory();
 const modalIsOpen = ref(false);
 const subCategories = ref<SubCategory[]>();
 const subCategory = ref<SubCategory | null>(null);
@@ -17,8 +19,6 @@ const closeModal = () => {
   modalIsOpen.value = false;
   subCategory.value = null;
 };
-
-const { deleteSubCategorie } = useSubCategory();
 
 const props = defineProps<{
   subCategories: GetDataWithParams;
@@ -39,12 +39,14 @@ const showSearchedData = (data: GetDataWithParams) => {
 };
 
 const handleCreated = (data: SubCategory) => {
+  toastSuccess("SubCategoría creada con éxito.");
   subCategories.value?.push(data);
 };
 const handleUpdated = (data: SubCategory) => {
   const findIndex = subCategories.value!.findIndex(({ id }) => id === data.id);
 
   if (findIndex !== -1) {
+    toastSuccess("SubCategoría actualizada con éxito.");
     subCategories.value![findIndex] = data;
   }
 };
@@ -54,10 +56,16 @@ const editCategory = (data: SubCategory) => {
 };
 
 const handleDeleteSubCategory = async (id: number) => {
-  const { success } = await deleteSubCategorie(id);
-  if (success) {
-    const index = subCategories.value!.findIndex((el) => el.id === id);
-    subCategories.value!.splice(index, 1);
+  const isConfirmed = await confirmDelete(
+    "Al eliminar una subcategoría los productos que le pertenezcan a esta pasarán como inactivos"
+  );
+  if (isConfirmed) {
+    const { success } = await deleteSubCategorie(id);
+    if (success) {
+      toastSuccess("SubCategoría eliminada con éxito.");
+      const index = subCategories.value!.findIndex((el) => el.id === id);
+      subCategories.value!.splice(index, 1);
+    }
   }
 };
 </script>

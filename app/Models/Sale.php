@@ -10,30 +10,35 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Sale extends Model
 {
-    use HasFactory;
+  use HasFactory;
 
-    protected $fillable = [
-      'sub_total',
-      'discount_total',
-      'total',
-      'igv',
-      'state',
-      'user_id',
-      'client_id',
-    ];
+  protected $fillable = [
+    'sub_total',
+    'discount_total',
+    'total',
+    'igv',
+    'state',
+    'user_id',
+    'client_id',
+  ];
 
-    public function client(): BelongsTo
-    {
-      return $this->belongsTo(Client::class);
-    }
+  public function client(): BelongsTo
+  {
+    return $this->belongsTo(Client::class);
+  }
 
-    public function creditSale(): HasOne
-    {
-      return $this->hasOne(CreditSale::class);
-    }
+  public function user(): BelongsTo
+  {
+    return $this->belongsTo(User::class);
+  }
 
-    public function products(): BelongsToMany
-    {
-      return $this->belongsToMany(Product::class);
-    }
+  public function creditSale(): HasOne
+  {
+    return $this->hasOne(CreditSale::class);
+  }
+
+  public function products(): BelongsToMany
+  {
+    return $this->belongsToMany(Product::class);
+  }
 }

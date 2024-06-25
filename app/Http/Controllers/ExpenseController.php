@@ -4,12 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ExpenseRequest;
 use App\Http\Resources\ExpenseResource;
+use App\Http\Services\DailyCashService;
 use App\Models\Expense;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class ExpenseController extends Controller
 {
+  public function __construct(
+    private DailyCashService $dailyCashService,
+  ) {
+  }
   /**
    * Display a listing of the resource.
    */
@@ -35,6 +40,17 @@ class ExpenseController extends Controller
    */
   public function store(ExpenseRequest $request)
   {
+    $dailyCash = $this->dailyCashService->searchDailyCashById($request['daily_cash_id']);
+    $amountExpense = $request['amount'];
+    if ($request['type'] == 2) {
+      if ($dailyCash->final_money < $amountExpense) {
+        return response()->json(['message' => 'El monto de egreso es mayor al monto de la caja'], 404);
+      } else {
+        $this->dailyCashService->decreaseCashAmountByInstance($amountExpense, $dailyCash);
+      }
+    } else {
+      $this->dailyCashService->increaseCashAmountByInstance($amountExpense, $dailyCash);
+    }
     $expense = Expense::create($request->all());
 
     return response()->json(new ExpenseResource($expense), 201);

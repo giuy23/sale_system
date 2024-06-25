@@ -31,8 +31,8 @@ class ProductRequest extends FormRequest
             'minimum_quantity' => ['nullable', 'integer'],
             'provider_id' => ['required', 'integer', 'min:1' ],
             'sub_category_id' => ['required', 'integer', 'min:1' ],
-            'image' => ['required', 'image'],
-            'images' => ['nullable', 'array','image'],
+            'image' => $this->isMethod("PUT") ? ['sometimes', 'image', 'max:4096'] : ['required', 'image', 'max:4096'],
+            // 'images' => ['nullable', 'array','image'],
         ];
     }
 }

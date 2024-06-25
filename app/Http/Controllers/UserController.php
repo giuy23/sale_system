@@ -72,6 +72,17 @@ class UserController extends Controller
   /**
    * Update the specified resource in storage.
    */
+
+  public function changeState(Request $request, User $user)
+  {
+    $request->validate(['state' => ['required', 'boolean']]);
+    $user->update(['state' => $request->state]);
+    $updatedUser = User::find($user->id);
+    $user['state'] = 1;
+
+    return response()->json(new UserResource($updatedUser));
+  }
+
   public function update(UserRequest $request, User $user)
   {
     $user->update($request->all());

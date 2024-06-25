@@ -10,13 +10,29 @@ export function useProduct() {
     try {
       const { data } = await axios<Product>({
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
-        method: 'POST',
-        url: route('product.store'),
-        data: payload
+        method: "POST",
+        url: route("product.store"),
+        data: payload,
       });
 
+      return { success: true, data };
+    } catch (error) {
+      return { success: false };
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const changeState = async (id: number, state: boolean) => {
+    loading.value = true;
+    try {
+      const { data } = await axios<Product>({
+        method: "PUT",
+        url: route("product.changeState", id),
+        data: { state },
+      });
       return { success: true, data };
     } catch (error) {
       return { success: false };
@@ -30,17 +46,15 @@ export function useProduct() {
     try {
       const { data } = await axios<Product>({
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
-        method: 'POST',
-        url: route('product.update', payload.id),
-        data: {...payload, _method: 'PUT'}
+        method: "POST",
+        url: route("product.update", payload.id),
+        data: { ...payload, _method: "PUT" },
       });
 
       return { success: true, data };
     } catch (error) {
-      console.log(error);
-
       return { success: false };
     } finally {
       loading.value = false;
@@ -68,5 +82,6 @@ export function useProduct() {
     createProduct,
     updateProduct,
     deleteProduct,
+    changeState,
   };
 }

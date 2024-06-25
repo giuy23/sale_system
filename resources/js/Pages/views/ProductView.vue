@@ -7,13 +7,18 @@ import Pagination from "@/Components/common/Pagination.vue";
 import SearchData from "@/Components/common/SearchData.vue";
 import { useProduct } from "@/composables/useProduct";
 import { ref, watch } from "vue";
+import {
+  confirmAction,
+  confirmDelete,
+  toastSuccess,
+} from "@/Components/utils/toast";
 
 const modalIsOpen = ref(false);
 const products = ref<Product[]>();
 const product = ref<Product | null>(null);
 const links = ref<Object>();
 
-const { deleteProduct } = useProduct();
+const { deleteProduct, changeState } = useProduct();
 const props = defineProps<{
   products: GetDataWithParams;
 }>();
@@ -29,8 +34,8 @@ watch(
 
 const openModal = () => (modalIsOpen.value = true);
 const closeModal = () => {
-  modalIsOpen.value = false
-  product.value = null
+  modalIsOpen.value = false;
+  product.value = null;
 };
 
 const showSearchedData = (data: GetDataWithParams) => {
@@ -39,12 +44,14 @@ const showSearchedData = (data: GetDataWithParams) => {
 };
 
 const handleCreated = (data: Product) => {
+  toastSuccess("Producto creado con éxito.");
   products.value!.push(data);
 };
 
 const handleUpdated = (data: Product) => {
   const findIndex = products.value!.findIndex(({ id }) => id === data.id);
   if (findIndex !== -1) {
+    toastSuccess("Producto actualizado con éxito.");
     products.value![findIndex] = data;
   }
 };
@@ -52,11 +59,32 @@ const handleUpdated = (data: Product) => {
 const editProduct = async (data: Product) => {
   product.value = data;
 };
+
+const handleChangeState = async (id: number, state: boolean) => {
+  const isConfirmed = await confirmAction();
+  console.log(isConfirmed);
+
+  if (isConfirmed === true) {
+    const { success, data } = await changeState(id, state);
+    if (success) {
+      toastSuccess("Producto actualizado con éxito");
+      const finIndex = products.value?.findIndex((el) => el.id === id);
+      if (finIndex !== -1) {
+        products.value![finIndex!] = data!;
+      }
+    }
+  }
+};
+
 const handleDeleteProduct = async (id: number) => {
-  const success = await deleteProduct(id);
-  if (success) {
-    const index = products.value!.findIndex((el) => el.id === id);
-    products.value!.splice(index, 1);
+  const isConfirmed = await confirmDelete();
+  if (isConfirmed) {
+    const { success } = await deleteProduct(id);
+    if (success) {
+      toastSuccess("Producto eliminado con éxito.");
+      const index = products.value!.findIndex((el) => el.id === id);
+      products.value!.splice(index, 1);
+    }
   }
 };
 </script>
@@ -100,6 +128,7 @@ const handleDeleteProduct = async (id: number) => {
       :products="products!"
       @edit="editProduct"
       @delete="handleDeleteProduct"
+      @change-state="handleChangeState"
     />
 
     <Pagination :links="links" />

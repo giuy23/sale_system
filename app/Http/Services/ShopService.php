@@ -26,6 +26,10 @@ class ShopService
         ->where('id', $product['id'])
         ->first();
 
+      if ($productPrice['quantity'] < $product['quantitySell']) {
+        return ['error' => 'Cantidad del producto insuficiente'];
+      }
+
       $product['sale_price'] = $productPrice->sale_price;
       $product['original_quantity'] = $productPrice->quantity;
       $product['name'] = $productPrice->name;
@@ -49,9 +53,9 @@ class ShopService
     }
 
     $productFinal['total'] = $totalPrice;
-    $productFinal['igv'] = number_format($totalPrice * 0.18, 2);
-    $productFinal['sub_total'] = number_format(($totalPrice - ($totalPrice * 0.18)), 2);//IGV -> 18%
-    $productFinal['discount_total'] = $totalDiscount;
+    $productFinal['igv'] = number_format($totalPrice * 0.18, 2, '.', '');
+    $productFinal['sub_total'] = number_format(($totalPrice - ($totalPrice * 0.18)), 2, '.', ''); //IGV -> 18%
+    $productFinal['discount_total'] = number_format($totalDiscount, 2, '.', '');
 
     return $productFinal;
   }
@@ -73,14 +77,13 @@ class ShopService
 
   public function saveShopInTableSaleDetail($products, $saleId)
   {
-    // dd($products, $saleId);
     try {
       foreach ($products as $product) {
         ProductSale::create([
           'sale_id' => $saleId,
           'product_id' => $product['id'],
           'quantity' => $product['quantitySell'],
-          'discount' => $product['discount_total'],
+          'discount' => $product['discount'],
           'price' => $product['sale_price'],
           'total' => $product['total'],
         ]);
@@ -114,7 +117,7 @@ class ShopService
     }
   }
 
-  public function discpuntQuantityProducts($products)
+  public function discountQuantityProducts($products)
   {
     foreach ($products as $product) {
       Product::where('id', $product['id'])

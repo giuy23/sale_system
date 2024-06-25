@@ -16,10 +16,10 @@ class DailyCashResource extends JsonResource
   {
     return [
       'id' => $this->id,
-      'start_money' => $this->start_money,
-      'final_money' => $this->final_money ?? 0.00,
-      'profit' => $this->profit ?? 0.00,
-      'state' => $this->state ?? 1,
+      'start_money' => floatval($this->start_money),
+      'final_money' => floatval($this->final_money ?? 0.00),
+      'profit' => floatval($this->profit ?? 0.00),
+      'state' => intval($this->state ?? 1),
       'user_name' => $this->user->name,
       'user_id' => $this->user_id,
 

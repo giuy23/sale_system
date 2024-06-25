@@ -7,6 +7,7 @@ import ProviderList from "@/Components/Providers/ProviderList.vue";
 import Pagination from "@/Components/common/Pagination.vue";
 import SearchData from "@/Components/common/SearchData.vue";
 import { useProvider } from "@/composables/useProvider";
+import { toastSuccess, confirmDelete } from "@/Components/utils/toast";
 
 const modalIsOpen = ref(false);
 const providers = ref<Provider[]>();
@@ -36,11 +37,16 @@ const showSearchedData = (data: GetDataWithParams) => {
 };
 
 const handleCreated = async (data: Provider) => {
+  toastSuccess("Proveedor(a) creado con éxito");
+  toastSuccess("Proveedor(a) creado con éxito");
   providers.value!.push(data);
 };
 const handleUpdated = async (data: Provider) => {
   const findIndex = providers.value!.findIndex(({ id }) => id === data.id);
-  if (findIndex !== 1) {
+  console.log(findIndex);
+
+  if (findIndex !== -1) {
+    toastSuccess("Proveedor(a) actualizado con éxito");
     providers.value![findIndex] = data;
   }
 };
@@ -50,11 +56,19 @@ const editProvider = async (data: Provider) => {
 };
 
 const handleDeleteProvider = async (id: number) => {
-  const success = await deleteProvider(id);
-  if (success) {
-    const index = providers.value!.findIndex((el) => el.id === id);
-    providers.value!.splice(index, 1);
+  const isConfirmed = await confirmDelete(
+    "Al borrar a un proveedor los productos que le pertenezcan a este pasarán a estar inactivos. "
+  );
+
+  if (isConfirmed) {
+    const { success } = await deleteProvider(id);
+    if (success) {
+      toastSuccess("Proveedor(a) eliminada con éxito");
+      const index = providers.value!.findIndex((el) => el.id === id);
+      providers.value!.splice(index, 1);
+    }
   }
+
 };
 </script>
 

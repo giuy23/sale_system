@@ -121,7 +121,7 @@ const closeModal = () => {
             </div>
             <div class="col-12 mb-3">
               <label for="name_company" class="form-label"
-                >Nombre de la compañia</label
+                >Nombre de la compañia*</label
               >
               <input
                 type="text"
@@ -133,7 +133,7 @@ const closeModal = () => {
               />
             </div>
             <div class="col-12 mb-3">
-              <label for="cellphone" class="form-label">N° Celular</label>
+              <label for="cellphone" class="form-label">N° Celular*</label>
               <input
                 type="text"
                 id="cellphone"
@@ -145,10 +145,10 @@ const closeModal = () => {
             </div>
           </div>
           <div class="col-12 mb-3">
-            <label for="dni" class="form-label">DNI</label>
+            <label for="document_number" class="form-label">DNI</label>
             <input
               type="text"
-              id="dni"
+              id="document_number"
               class="form-control"
               placeholder="Escriba el nombre"
               v-model="providerForm.document_number"
@@ -164,7 +164,6 @@ const closeModal = () => {
                 id="image"
                 class="form-control"
                 @input="handleInputImage"
-                required
               />
             </div>
           </div>

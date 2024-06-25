@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { Product } from "@/types";
+import { computed } from "vue";
 
 const props = defineProps<{
   products: Product[];
@@ -8,6 +9,7 @@ const props = defineProps<{
 const emits = defineEmits<{
   edit: [Product];
   delete: [number];
+  changeState: [id: number, state: boolean];
 }>();
 
 const editProduct = (data: Product) => {
@@ -17,6 +19,18 @@ const editProduct = (data: Product) => {
 const deleteProduct = (id: number) => {
   emits("delete", id);
 };
+
+const changeState = (id: number, state: boolean) => {
+  emits("changeState", id, state);
+};
+
+const state = computed(() => (value: boolean) => {
+  let tag;
+  value
+    ? (tag = "<span class='text-info fw-bolder'>Activo</span>")
+    : (tag = "<span class='text-danger fw-bolder'>Inactivo</span>");
+  return tag;
+});
 </script>
 
 <template>
@@ -48,7 +62,7 @@ const deleteProduct = (id: number) => {
             <td>{{ product.sale_price }}</td>
             <td>{{ product.quantity }}</td>
             <td>{{ product.minimum_quantity }}</td>
-            <td>{{ product.state }}</td>
+            <td v-html="state(product.state!)"></td>
             <td>
               <figure>
                 <img
@@ -76,6 +90,18 @@ const deleteProduct = (id: number) => {
                     @click="editProduct(product)"
                     ><i class="bx bx-edit-alt me-1"></i> Editar</a
                   >
+                  <a
+                    v-if="product.state == false"
+                    class="dropdown-item"
+                    @click="changeState(product.id, !product.state)"
+                    ><i class="bx bx-trash me-1"> Activar</i>
+                  </a>
+                  <a
+                    v-if="product.state"
+                    class="dropdown-item"
+                    @click="changeState(product.id, !product.state)"
+                    ><i class="bx bx-trash me-1"> </i>Desactivar
+                  </a>
                   <a class="dropdown-item" @click="deleteProduct(product.id)"
                     ><i class="bx bx-trash me-1"></i> Eliminar</a
                   >
