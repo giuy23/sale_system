@@ -16,8 +16,8 @@ return new class extends Migration
             $table->string('name',150);
             $table->string('name_comercial',150);
             $table->text('description')->nullable();
-            $table->string('cellphone', 21);
-            $table->string('address');
+            $table->string('cell_phone', 21);
+            $table->string('address', 250);
             $table->string('RUC', 11)->nullable();
             $table->timestamps();
         });

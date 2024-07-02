@@ -41,7 +41,7 @@ class Product extends Model
 
   public function sales(): BelongsToMany
   {
-    return $this->belongsToMany(Sale::class);
+    return $this->belongsToMany(Sale::class, 'product_sales');
   }
 
   public function images()

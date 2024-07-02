@@ -3,7 +3,7 @@ import { Provider } from "@/types/index";
 import { reactive, ref, watch } from "vue";
 import { useProvider } from "@/composables/useProvider";
 
-const { createProvider, updateProvider } = useProvider();
+const { createProvider, updateProvider, loading } = useProvider();
 
 const props = defineProps<{
   provider: Provider | null;
@@ -176,7 +176,9 @@ const closeModal = () => {
           >
             Cerrar
           </button>
-          <button type="submit" class="btn btn-primary">Guardar</button>
+          <button type="submit" :disabled="loading" class="btn btn-primary">
+            Guardar
+          </button>
         </div>
       </form>
     </div>

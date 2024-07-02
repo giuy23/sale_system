@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { Product } from "@/types";
 import { computed } from "vue";
+import { USER_ROLE } from "../utils/types";
 
 const props = defineProps<{
   products: Product[];
@@ -44,11 +45,11 @@ const state = computed(() => (value: boolean) => {
             <th>Código de Barras</th>
             <th>Precio de compra</th>
             <th>Precio de venta</th>
-            <th>Cantidad</th>
-            <th>Cantidad Mínima</th>
+            <th>Cant.</th>
+            <th>Cant. Mínima</th>
             <th>Estado</th>
             <th>Imagen</th>
-            <th>Acciones</th>
+            <th v-if="$page.props.auth.user.role_id === USER_ROLE.ADMIN.role">Acciones</th>
           </tr>
         </thead>
         <tbody class="table-border-bottom-0">
@@ -73,7 +74,7 @@ const state = computed(() => (value: boolean) => {
               </figure>
             </td>
             <td>
-              <div class="dropdown">
+              <div v-if="$page.props.auth.user.role_id === USER_ROLE.ADMIN.role" class="dropdown">
                 <button
                   type="button"
                   class="btn p-0 dropdown-toggle hide-arrow"
@@ -94,7 +95,7 @@ const state = computed(() => (value: boolean) => {
                     v-if="product.state == false"
                     class="dropdown-item"
                     @click="changeState(product.id, !product.state)"
-                    ><i class="bx bx-trash me-1"> Activar</i>
+                    ><i class="bx bx-trash me-1"> </i>Activar
                   </a>
                   <a
                     v-if="product.state"

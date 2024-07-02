@@ -3,7 +3,7 @@ import { UserType } from "@/types/index";
 import { reactive, ref, watch } from "vue";
 import { useUser } from "@/composables/useUser";
 
-const { createUser, updateUser } = useUser();
+const { createUser, updateUser, loading } = useUser();
 const props = defineProps<{
   user: UserType | null;
   reset: Boolean;
@@ -18,7 +18,7 @@ const emits = defineEmits<{
 watch(
   () => props.user,
   (value) => {
-    userForm = {...value!}
+    userForm = { ...value! };
     // Object.assign(userForm, value);
   }
 );
@@ -175,12 +175,16 @@ const handleInputImage = (e: Event) => {
                 v-model="userForm.cell_phone"
               />
             </div>
-
           </div>
           <div class="row g-2">
             <div class="col-12 mb-3">
               <label for="password" class="form-label">Rol*</label>
-              <select class="form-select" name="role_id" id="role_id" v-model="userForm.role_id">
+              <select
+                class="form-select"
+                name="role_id"
+                id="role_id"
+                v-model="userForm.role_id"
+              >
                 <option :value="1">Administrador</option>
                 <option :value="2">Vendedor</option>
               </select>
@@ -206,7 +210,7 @@ const handleInputImage = (e: Event) => {
           >
             Cerrar
           </button>
-          <button type="submit" class="btn btn-primary">Guardar</button>
+          <button type="submit" :disabled="loading" class="btn btn-primary">Guardar</button>
         </div>
       </form>
     </div>

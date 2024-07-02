@@ -7,6 +7,9 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Traits\ImageTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 
 class UserController extends Controller
@@ -48,7 +51,11 @@ class UserController extends Controller
     if ($request->hasFile('image')) {
       $urlImage = $this->uploadImage($request->image, $user, User::path, false);
       $user->image = $urlImage;
+    } else {
+      $urlImage = $this->createImage($user, User::path);
+      $user->image = $urlImage;
     }
+    $user['state'] = 1;
 
     return response()->json(new UserResource($user), 201);
   }
@@ -92,6 +99,35 @@ class UserController extends Controller
     }
 
     return response()->json(new UserResource($user));
+  }
+
+  public function updateImage(Request $request)
+  {
+    $request->validate(['image' => ['required', 'image', 'max:4096']]);
+    $idUser = Auth::id();
+    $user = User::findOrFail($idUser);
+
+    if ($request->hasFile('image')) {
+      $urlImage = $user->editImage($request->image, $user, User::path);
+      $user->image = $urlImage;
+    }
+
+    return response()->json(['success' => true], 201);
+  }
+
+  public function updatePassword(Request $request)
+  {
+    $validated = $request->validate([
+      'current_password' => ['required', 'current_password'],
+      'password' => ['required', Password::defaults(), 'confirmed'],
+    ]);
+
+    $request->user()->update([
+      'password' => Hash::make($validated['password']),
+    ]);
+
+    return response()->json([], 200);
+    // return back();
   }
 
   /**

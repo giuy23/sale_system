@@ -6,6 +6,7 @@ use App\Http\Requests\DailyCashRequest;
 use App\Http\Requests\DailyCashStoreRequest;
 use App\Http\Requests\DailyCashUpdateRequest;
 use App\Http\Resources\DailyCashResource;
+use App\Http\Services\DailyCashService;
 use App\Models\DailyCash;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -14,6 +15,9 @@ use Inertia\Inertia;
 
 class DailyCashController extends Controller
 {
+  public function __construct(private DailyCashService $dailyCashService)
+  {
+  }
   /**
    * Display a listing of the resource.
    */
@@ -40,12 +44,14 @@ class DailyCashController extends Controller
    */
   public function store(DailyCashStoreRequest $request)
   {
-    $currentDate = Carbon::today();
-    $cashIsOpen = DailyCash::whereDate('created_at', $currentDate)->first();
+    $startMoney = $request['start_money'];
+    $cashIsOpen = $this->dailyCashService->searchDailyCashCurrent();
 
     if (!$cashIsOpen) {
-      $request['user_id'] = Auth::id();
-      $dailyCash = DailyCash::create($request->all());
+      $userId = Auth::id();
+      $dailyCash = DailyCash::create(
+        ['start_money' => $startMoney, 'final_money' => $startMoney, 'user_id' => $userId]
+      );
       return response()->json(new DailyCashResource($dailyCash), 201);
     }
 
@@ -89,5 +95,25 @@ class DailyCashController extends Controller
   {
     $dailyCash->update($request->all());
     return response()->json(new DailyCashResource($dailyCash), 201);
+  }
+
+  public function getLastDailyCashes()
+  {
+    $dailyCashes = DailyCash::select(['id', 'created_at', 'final_money'])
+      ->latest()->limit(5)->get();
+    return response()->json($dailyCashes);
+  }
+
+  public function getProfit()
+  {
+    $dailyCash = $this->dailyCashService->searchDailyCashCurrent();
+    // dd($dailyCash);
+    $profit = $dailyCash->profit ?? -1; //-1 -> Caja no abierta
+    // if ($profit == null) {
+    //   $profit = -1;
+    // }
+    // dd($profit, $profit == -1);
+
+    return response()->json($profit);
   }
 }

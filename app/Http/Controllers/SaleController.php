@@ -9,6 +9,10 @@ use App\Http\Services\DailyCashService;
 use App\Models\Client;
 use App\Models\ProductSale;
 use App\Models\Sale;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -133,5 +137,119 @@ class SaleController extends Controller
     $sale->update(['state' => 2]);
 
     return response()->json([], 200);
+  }
+
+  public function getAmountTotalSalesToday()
+  {
+    $currentDate = Carbon::today();
+    $sales = Sale::select('total')->whereDate('created_at', $currentDate)->where('state', 1)->get();
+
+    $totalSales = number_format($sales->sum('total') ?? 0, 1);
+    // dd($totalSales);
+    return response()->json($totalSales);
+  }
+
+  // public function getDetailSalePdf(Sale $sale)
+  // {
+  //   $sales = ProductSale::where('sale_id', $sale->id)->get();
+  //   $pdf = Pdf::loadView('pdf.detail-sale', [
+  //     'sales' => $sales,
+  //   ])->setPaper('b7', 'portrait');
+  //   $pdf->stream('pdf.detail-sale.pdf');
+  // }
+  // public function getDetailSalePdf(Sale $sale)
+  // {
+  //   $sales = ProductSale::where('sale_id', $sale->id)->get();
+  //   // $pdf = Pdf::loadView('pdf.detail-sale', [
+  //   //   'sales' => $sales,
+  //   // ])->setPaper([0, 0, 80, 1000], 'portrait'); // Ancho fijo, largo dinámico
+
+  //   // return $pdf->stream('detail-sale.pdf');
+  //   $html = 'pdf.detail-sale.pdf';
+  //   $dompdf = Pdf::loadView('pdf.detail-sale', [
+  //     'sales' => $sales,
+  //   ]);
+  //   // $dompdf = new Dompdf();
+  //   $dompdf->set_paper(array(0, 0, 600, 800));
+
+  //   $GLOBALS['bodyHeight'] = 0;
+
+  //   $dompdf->setCallbacks(
+  //     array(
+  //       'myCallbacks' => array(
+  //         'event' => 'end_frame',
+  //         'f' => function ($frame) {
+  //           $node = $frame->get_node();
+
+  //           if (strtolower($node->nodeName) === "body") {
+  //             $padding_box = $frame->get_padding_box();
+  //             $GLOBALS['bodyHeight'] += $padding_box['h'];
+  //           }
+  //         }
+  //       )
+  //     )
+  //   );
+
+  //   $dompdf->loadHtml($html);
+  //   $dompdf->render();
+  //   unset($dompdf);
+  //   dd($GLOBALS['bodyHeight']);
+  //   $dompdf = new Dompdf();
+  //   $dompdf->set_paper(array(0, 0, 600, $GLOBALS['bodyHeight'] + 50));
+  //   // $dompdf->loadHtml($html);
+  //   // $dompdf->render();
+  //   $dompdf->stream($html, [
+  //     'sales' => $sales,
+  //   ]);
+
+  //   // dd($docHeight);
+  // }
+
+  public function getDetailSalePdf(Sale $sale)
+  {
+    $sales = ProductSale::where('sale_id', $sale->id)->get();
+
+    $html = view('pdf.detail-sale', ['sales' => $sales])->render();
+
+    $pdf = new Dompdf();
+    $options = $pdf->getOptions();
+    $pdf->setPaper('b7', 'portrait'); // Ancho fijo, altura temporal
+
+    $options->set(
+      array(
+        'isRemoteEnabled' => true,
+        'isHtml5ParserEnabled' => true
+      )
+    );
+    $pdf->setOptions($options);
+    $pdf->loadHtml($html);
+
+    $GLOBALS['bodyHeight'] = 0;
+
+    $pdf->setCallbacks([
+      'myCallbacks' => [
+        'event' => 'end_frame',
+        'f' => function ($frame) {
+          $node = $frame->get_node();
+
+          if (strtolower($node->nodeName) === "body") {
+            $padding_box = $frame->get_padding_box();
+            $GLOBALS['bodyHeight'] += $padding_box['h'];
+          }
+        }
+      ]
+    ]);
+
+    $pdf->render();
+    unset($pdf);
+    $docHeight = $GLOBALS['bodyHeight'] + 100;
+
+    $pdf = new Dompdf($options);
+    $options = $pdf->getOptions();
+    $pdf->setPaper([0, 0, 500, $docHeight], 'portrait');
+    $pdf->loadHtml($html);
+    $pdf->render();
+    return $pdf->stream('detail-sale.pdf', ['Attachment' => 0]);
+    // return $pdf->stream('detail-sale.pdf', ['sales' => $sales]);
   }
 }

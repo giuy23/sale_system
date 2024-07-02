@@ -7,7 +7,6 @@ import db from "just-debounce";
 import { toastInfo, toastSuccess } from "../utils/toast";
 import { useSearchToSell } from "@/composables/useSearchToSell";
 
-// const clients = ref<Client[]>();
 const modalRefShop = ref<HTMLDivElement | null>(null);
 
 const {
@@ -17,7 +16,9 @@ const {
   saleType,
   customerPayment,
   descriptionDebt,
+  loading,
   saveSale,
+  resetFormValues,
 } = shop();
 
 const { searchClient, clients } = useSearchToSell();
@@ -58,7 +59,11 @@ const handleCreatedClient = (data: Client) => {
 const handleCreateShop = async () => {
   const { success, msg } = await saveSale();
   if (success === false && msg !== "") return toastInfo(msg);
-  if (success === true) toastSuccess(msg);
+  if (success === true) {
+    closeModal();
+    resetFormValues();
+    toastSuccess(msg);
+  }
 };
 
 const handleOpenModalShop = () => {
@@ -218,7 +223,9 @@ const textSaleType = computed(() => {
           >
             Cerrar
           </button>
-          <button type="submit" class="btn btn-primary">Guardar</button>
+          <button type="submit" :disabled="loading" class="btn btn-primary">
+            Guardar
+          </button>
         </div>
       </form>
     </div>

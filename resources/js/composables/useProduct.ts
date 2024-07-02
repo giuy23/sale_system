@@ -1,9 +1,10 @@
 import { ref } from "vue";
 import axios from "axios";
-import { Product } from "@/types";
+import { Product, BestProductSold, ProductRestock } from "@/types";
 
 export function useProduct() {
   const loading = ref(false);
+  const productsRestock = ref<ProductRestock[]>([]);
 
   const createProduct = async (payload: Product) => {
     loading.value = true;
@@ -76,12 +77,49 @@ export function useProduct() {
     }
   };
 
+  const getBestSellingProducts = async (date: string) => {
+    loading.value = true;
+    try {
+      const { data } = await axios<BestProductSold[]>({
+        method: "POST",
+        url: route("product.bestSelling"),
+        data: {
+          date,
+        },
+      });
+      return { success: true, data };
+    } catch (error) {
+      return { success: false };
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const getProductsToRestock = async () => {
+    loading.value = true;
+    try {
+      const { data } = await axios<ProductRestock[]>({
+        method: "GET",
+        url: route("product.restock"),
+      });
+      productsRestock.value = data;
+      return { success: true };
+    } catch (error) {
+      return { success: false };
+    } finally {
+      loading.value = false;
+    }
+  };
+
   return {
     loading,
+    productsRestock,
 
     createProduct,
     updateProduct,
     deleteProduct,
     changeState,
+    getBestSellingProducts,
+    getProductsToRestock,
   };
 }

@@ -21,7 +21,6 @@ watch(
   (value) => {
     expenseForm.daily_cash_id = value!.id!;
     expenseForm.type = value!.type!;
-    console.log(expenseForm);
   }
 );
 

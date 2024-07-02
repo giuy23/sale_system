@@ -5,7 +5,7 @@ import { useSearch } from "@/composables/useSearch";
 import { useSubCategory } from "@/composables/useSubCategory";
 import db from "just-debounce";
 const { getSearchData } = useSearch();
-const { createSubCategorie, updateteSubCategorie } = useSubCategory();
+const { createSubCategorie, updateteSubCategorie, loading } = useSubCategory();
 
 const props = defineProps<{
   subCategory: SubCategory | null;
@@ -180,7 +180,9 @@ const handleSelected = ({ id }: Category) => {
           >
             Cerrar
           </button>
-          <button type="submit" class="btn btn-primary">Guardar</button>
+          <button type="submit" :disabled="loading" class="btn btn-primary">
+            Guardar
+          </button>
         </div>
       </form>
     </div>

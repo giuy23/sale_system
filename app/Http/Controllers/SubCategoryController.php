@@ -84,6 +84,7 @@ class SubCategoryController extends Controller
    */
   public function destroy(SubCategory $subCategory)
   {
+    $subCategory->products()->update(['state' => 0]);
     $subCategory->delete();
     return response()->json(['success' => true]);
   }

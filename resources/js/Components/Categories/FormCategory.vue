@@ -3,7 +3,7 @@ import { Category } from "@/types";
 import { useCategory } from "@/composables/useCategory";
 import { ref, watch, reactive } from "vue";
 
-const { createCategory, updateCategory } = useCategory();
+const { createCategory, updateCategory, loading } = useCategory();
 const props = defineProps<{
   category: Category | null;
   reset: boolean;
@@ -122,7 +122,9 @@ const closeModal = () => {
           >
             Cerrar
           </button>
-          <button type="submit" class="btn btn-primary">Guardar</button>
+          <button type="submit" :disabled="loading" class="btn btn-primary">
+            Guardar
+          </button>
         </div>
       </form>
     </div>

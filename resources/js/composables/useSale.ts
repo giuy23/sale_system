@@ -3,6 +3,7 @@ import { ref } from "vue";
 
 export function useSale() {
   const loading = ref(false);
+  const totalSalesToday = ref<number>();
 
   const cancelSale = async (id: number) => {
     loading.value = true;
@@ -54,11 +55,31 @@ export function useSale() {
     }
   };
 
+  const getTotalAmountToday = async () => {
+    loading.value = true;
+    try {
+      const { data } = await axios<number>({
+        method: "GET",
+        url: route("sale.totalSales"),
+      });
+      console.log(data);
+
+      totalSalesToday.value = data;
+      return { success: true };
+    } catch (error) {
+      return { success: false };
+    } finally {
+      loading.value = false;
+    }
+  };
+
   return {
     loading,
+    totalSalesToday,
 
     cancelSale,
     payDebtForTheSale,
     payAllDebts,
+    getTotalAmountToday,
   };
 }

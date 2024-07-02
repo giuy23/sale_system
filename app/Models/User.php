@@ -8,6 +8,7 @@ use App\Traits\ImageTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -82,8 +83,8 @@ class User extends Authenticatable
     return $this->belongsTo(Client::class);
   }
 
-  public function image()
-    {
-        return $this->morphOne(Image::class, 'imageable');
-    }
+  public function image(): MorphOne
+  {
+    return $this->morphOne(Image::class, 'imageable');
+  }
 }

@@ -43,7 +43,7 @@
         rel="stylesheet" />
 
     <!-- Icons. Uncomment required icon fonts -->
-    <link rel="stylesheet" href="{{ asset("assets/vendor/fonts/boxicons.css") }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/fonts/boxicons.css') }}" />
 
     <!-- THEME -->
     <link rel="stylesheet" href="{{ asset('assets/vendor/css/core.css') }}" class="template-customizer-core-css" />
@@ -76,13 +76,24 @@
     <script src="{{ asset('assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js') }}"></script>
 
     <script src="{{ asset('assets/vendor/js/menu.js') }}"></script>
-    <script src="{{ asset("assets/vendor/libs/apex-charts/apexcharts.js") }}"></script>
-    <script src="{{ asset('assets/js/main.js') }}"></script>
-
-    <script src=" {{ asset('assets/js/dashboards-analytics.js') }} "></script>
-
+    <script src="{{ asset('assets/vendor/libs/apex-charts/apexcharts.js') }}"></script>
     <script async defer src="https://buttons.github.io/buttons.js"></script>
 </body>
+
+<script type="module">
+  document.addEventListener('DOMContentLoaded', function() {
+    const loadMainScript = () => {
+      const script = document.createElement("script");
+      script.src = "/assets/js/main.js"; // Asegúrate de poner la ruta correcta a tu script
+      script.async = true;
+      script.onload = () => {
+      };
+      document.body.appendChild(script); // Añadimos el script al final del cuerpo del documento
+    };
+
+    loadMainScript();
+  });
+</script>
 
 
 </html>

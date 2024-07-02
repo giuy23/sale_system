@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { Provider } from "@/types";
+import { USER_ROLE } from "../utils/types";
 
 const props = defineProps<{
   providers: Provider[];
@@ -30,7 +31,9 @@ const deleteProvider = (id: number) => {
             <th>Nombre de Compañia</th>
             <th>Número de Celular</th>
             <th>Imagen</th>
-            <th>Acciones</th>
+            <th v-if="$page.props.auth.user.role_id === USER_ROLE.ADMIN.role">
+              Acciones
+            </th>
           </tr>
         </thead>
         <tbody class="table-border-bottom-0">
@@ -52,7 +55,13 @@ const deleteProvider = (id: number) => {
               </figure>
             </td>
             <td>
-              <div v-if="provider.id !== 1" class="dropdown">
+              <div
+                v-if="
+                  $page.props.auth.user.role_id === USER_ROLE.ADMIN.role &&
+                  provider.id !== 1
+                "
+                class="dropdown"
+              >
                 <button
                   type="button"
                   class="btn p-0 dropdown-toggle hide-arrow"

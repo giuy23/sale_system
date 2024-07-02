@@ -4,7 +4,7 @@ import { reactive } from "vue";
 import { watch, ref } from "vue";
 import { useClient } from "@/composables/useClient";
 
-const { createClient, updateClient } = useClient();
+const { createClient, updateClient, loading } = useClient();
 const props = defineProps<{
   client?: Client | null;
   reset?: Boolean;
@@ -19,7 +19,7 @@ const emits = defineEmits<{
 watch(
   () => props.client,
   (value) => {
-    clientForm = { ...value! };
+    Object.assign(clientForm, value!);
   }
 );
 
@@ -136,7 +136,9 @@ const handleUpdateClient = async () => {
           >
             Cerrar
           </button>
-          <button type="submit" class="btn btn-primary">Guardar</button>
+          <button type="submit" :disabled="loading" class="btn btn-primary">
+            Guardar
+          </button>
         </div>
       </form>
     </div>

@@ -4,6 +4,7 @@ import { Head } from "@inertiajs/vue3";
 import Sidebar from "./Sidebar.vue";
 import Header from "./Header.vue";
 import { Toaster } from "vue-sonner";
+
 </script>
 
 <template>
@@ -12,10 +13,10 @@ import { Toaster } from "vue-sonner";
   <div class="layout-wrapper layout-content-navbar">
     <div class="layout-container">
       <!-- Menu -->
+      <Sidebar />
       <div class="layout-page">
         <Header/>
 
-        <Sidebar />
         <!-- / Layout page -->
         <div class="content-wrapper">
           <div class="container-xxl flex-grow-1 container-p-y">
@@ -23,6 +24,7 @@ import { Toaster } from "vue-sonner";
           </div>
         </div>
       </div>
+
     </div>
     <!-- Overlay -->
     <div class="layout-overlay layout-menu-toggle"></div>

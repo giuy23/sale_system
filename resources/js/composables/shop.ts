@@ -14,10 +14,12 @@ const customerPayment = ref<number>(0);
 const descriptionDebt = ref<string>();
 const saleType = ref<number>(1);
 const client = ref(0);
+const loading = ref(false);
 
 const createCashSale = async () => {
   productsSold.value = [];
   transformedProducts();
+  loading.value = true;
   try {
     const { data } = await axios({
       method: "POST",
@@ -28,10 +30,13 @@ const createCashSale = async () => {
         client_id: client.value,
       },
     });
+    console.log(data);
+
     return { success: true, data };
   } catch (error) {
     return { success: false };
   } finally {
+    loading.value = false;
   }
 };
 
@@ -39,6 +44,7 @@ const createCreditSale = async () => {
   productsSold.value = [];
   transformedProducts();
   try {
+    loading.value = true;
     const { data } = await axios({
       method: "POST",
       url: route("shop.createSale"),
@@ -54,7 +60,23 @@ const createCreditSale = async () => {
   } catch (error) {
     return { success: false };
   } finally {
+    loading.value = false;
   }
+};
+
+const viewReceipt = (url: string) => {
+  const pdfWindow = window.open(url, "_blank");
+  pdfWindow!.onload = function () {
+    pdfWindow!.print();
+  };
+};
+
+const resetFormValues = () => {
+  products.value = [];
+  client.value = 1;
+  saleType.value = 1;
+  customerPayment.value = 0;
+  descriptionDebt.value = "";
 };
 
 const transformedProducts = () => {
@@ -128,6 +150,7 @@ export function shop() {
     saleType,
     customerPayment,
     client,
+    loading,
 
     subTotal,
     total,
@@ -136,5 +159,6 @@ export function shop() {
     descriptionDebt,
     saveSale,
     deleteProductToForm,
+    resetFormValues,
   };
 }

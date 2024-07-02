@@ -43,7 +43,7 @@ export const toastInfo = (msg: string) => {
   toast.info(msg);
 };
 
-export const confirmAction = (msg: string): Promise<boolean> => {
+export const confirmAction = (msg?: string): Promise<boolean> => {
   return new Promise((resolve) => {
     Swal.fire({
       title: "¿Estás seguro?",

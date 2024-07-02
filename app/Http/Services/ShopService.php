@@ -51,7 +51,6 @@ class ShopService
       $totalPrice += $product['total'];
       $totalDiscount += $product['discount_total'];
     }
-
     $productFinal['total'] = $totalPrice;
     $productFinal['igv'] = number_format($totalPrice * 0.18, 2, '.', '');
     $productFinal['sub_total'] = number_format(($totalPrice - ($totalPrice * 0.18)), 2, '.', ''); //IGV -> 18%
@@ -62,17 +61,21 @@ class ShopService
 
   public function saveShopInTableSale($sale, $typeSale, $clientId)
   {
-    $sale = Sale::create([
-      'sub_total' => $sale['sub_total'],
-      'total' => $sale['total'],
-      'discount_total' => $sale['discount_total'],
-      'igv' => $sale['igv'],
-      'state' => $typeSale,
-      'user_id' => Auth::id(),
-      'client_id' => $clientId,
-    ]);
+    try {
+      $sale = Sale::create([
+        'sub_total' => $sale['sub_total'],
+        'total' => $sale['total'],
+        'discount_total' => $sale['discount_total'],
+        'igv' => $sale['igv'],
+        'state' => $typeSale,
+        'user_id' => Auth::id(),
+        'client_id' => $clientId,
+      ]);
+      return $sale;
+    } catch (\Exception $e) {
+      return response()->json(['message' => 'Error al crear la venta.'], 500);
+    }
 
-    return $sale;
   }
 
   public function saveShopInTableSaleDetail($products, $saleId)
@@ -88,9 +91,8 @@ class ShopService
           'total' => $product['total'],
         ]);
       }
-      return true;
     } catch (\Exception $e) {
-      return false;
+      return response()->json(['message' => 'Error al guardar el detalle de la venta.'], 500);
     }
   }
 
@@ -106,24 +108,27 @@ class ShopService
       ]);
 
       if ($importedCash) {
-        $payment = PaymentHistory::create([
+        PaymentHistory::create([
           'credit_sale_id' => $creditSale->id,
           'payment_amount' => $importedCash,
         ]);
       }
-      return true;
     } catch (\Exception $e) {
-      return false;
+      return response()->json(['message' => 'Error al crear la venta.'], 500);
     }
   }
 
   public function discountQuantityProducts($products)
   {
-    foreach ($products as $product) {
-      Product::where('id', $product['id'])
-        ->update([
-          'quantity' => DB::raw('quantity - ' . $product['quantitySell'])
-        ]);
+    try {
+      foreach ($products as $product) {
+        Product::where('id', $product['id'])
+          ->update([
+            'quantity' => DB::raw('quantity - ' . $product['quantitySell'])
+          ]);
+      }
+    } catch (\Exception $th) {
+      return response()->json(['message' => 'Error al crear la venta.'], 500);
     }
   }
 }

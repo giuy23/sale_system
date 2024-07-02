@@ -96,7 +96,7 @@ const state = computed(() => (value: boolean) => {
                     v-if="dailyCash.state"
                     class="dropdown-item"
                     @click="
-                      changeStateCashRegister(dailyCash.id, dailyCash.state)
+                      changeStateCashRegister(dailyCash.id, !dailyCash.state)
                     "
                     ><i class="bx bx-trash me-1"></i> Cerrar Caja</a
                   >
@@ -117,7 +117,7 @@ const state = computed(() => (value: boolean) => {
                     v-else
                     class="dropdown-item"
                     @click="
-                      changeStateCashRegister(dailyCash.id, dailyCash.state)
+                      changeStateCashRegister(dailyCash.id, !dailyCash.state)
                     "
                     ><i class="bx bx-trash me-1"></i> Abrir Caja</a
                   >

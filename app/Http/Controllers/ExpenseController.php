@@ -6,6 +6,7 @@ use App\Http\Requests\ExpenseRequest;
 use App\Http\Resources\ExpenseResource;
 use App\Http\Services\DailyCashService;
 use App\Models\Expense;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -88,5 +89,16 @@ class ExpenseController extends Controller
   public function destroy(Expense $expense)
   {
     //
+  }
+
+  public function getBalance()
+  {
+    $currentDate = Carbon::today();
+    $exits = Expense::whereDate('created_at', $currentDate)->where('type', 2)->get();
+    $entries = Expense::whereDate('created_at', $currentDate)->whereIn('type', [1, 3])->get();
+
+    $entries = number_format($entries->sum('amount') ?? 0, 2);
+    $exits = number_format($exits->sum('amount') ?? 0, 2);
+    return response()->json(['entries' => $entries, 'exits' => $exits]);
   }
 }

@@ -1,24 +1,34 @@
 export interface User {
   id: number;
   name: string;
-  email: string;
-  email_verified_at: string;
-}
-
-export type UserType = {
-  id: number;
-  name: string;
   sur_name: string;
   email: string;
+  email_verified_at: string;
+  role_id: number;
   document_number: number;
   cell_phone: number | null;
-  role_id: number;
+}
 
+export type UserType = Pick<
+  User,
+  | "id"
+  | "name"
+  | "sur_name"
+  | "email"
+  | "role_id"
+  | "document_number"
+  | "cell_phone"
+> & {
   password: string;
   state?: boolean;
   role?: string;
   image?: string;
 };
+
+export type UserUpdate = Pick<
+  User,
+  "id" | "name" | "sur_name" | "email" | "document_number" | "cell_phone"
+>;
 
 export type MetaLinks = {
   current_page: number;
@@ -73,7 +83,7 @@ export type Product = {
   provider_id: number;
 
   images?: string[];
-  image?: string;
+  image?: File | string;
 };
 
 export type ProductToSell = {
@@ -143,6 +153,18 @@ export type SaleDetails = {
   quantitySell?: number;
 };
 
+export type Enterprise = {
+  id: number;
+  name: string;
+  name_comercial: string;
+  description: string;
+  cell_phone: number;
+  address: string;
+  RUC: number;
+
+  image?: string;
+};
+
 export type CreditSaleClient = {
   id: number;
   amount_payable: number;
@@ -159,15 +181,22 @@ export type ClientTotalDebt = {
 };
 
 export type DailyCashCreate = Pick<DailyCash, "id" | "start_money">;
+export type DailyCashCompare = Pick<
+  DailyCash,
+  "id" | "final_money" | "created_at"
+>;
 export type ClientToSell = Pick<Client, "id" | "full_name" | "document_number">;
 export type CreateExpense = Pick<Expense, "id" | "type">;
-
-
+export type BestProductSold = Pick<Product, "id", "name"> & {
+  sales_count: number;
+};
+export type ProductRestock = Pick<Product, "id" | "name" | "quantity">;
 
 export type PageProps<
   T extends Record<string, unknown> = Record<string, unknown>
 > = T & {
   auth: {
     user: User;
+    image: string;
   };
 };

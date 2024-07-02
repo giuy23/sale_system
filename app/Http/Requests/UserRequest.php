@@ -32,7 +32,6 @@ class UserRequest extends FormRequest
       'cell_phone' => ['nullable', 'numeric', 'digits:9'],
       'state' => ['nullable', 'boolean'],
       'role_id' => ['nullable', 'integer'],
-      // 'image' => $this->isMethod("PUT") ? ['sometimes', 'image', 'max:4096'] : ['nullable', 'image', 'max:4096'],
       'image' => ['nullable', 'image', 'max:4096']
     ];
   }

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { Client } from "@/types";
 import { computed } from "vue";
+import { USER_ROLE } from "../utils/types";
 
 const props = defineProps<{
   clients: Client[];
@@ -44,7 +45,9 @@ const state = computed(() => (value: boolean) => {
             <th>DNI</th>
             <th>Número de Celular</th>
             <th>Estado</th>
-            <th>Acciones</th>
+            <th v-if="$page.props.auth.user.role_id === USER_ROLE.ADMIN.role">
+              Acciones
+            </th>
           </tr>
         </thead>
         <tbody class="table-border-bottom-0">
@@ -57,7 +60,13 @@ const state = computed(() => (value: boolean) => {
             <td>{{ client.cell_phone }}</td>
             <td v-html="state( client.state! )"></td>
             <td>
-              <div class="dropdown" v-if="client.id !== 1">
+              <div
+                class="dropdown"
+                v-if="
+                  $page.props.auth.user.role_id === USER_ROLE.ADMIN.role &&
+                  client.id !== 1
+                "
+              >
                 <button
                   type="button"
                   class="btn p-0 dropdown-toggle hide-arrow"
@@ -78,7 +87,7 @@ const state = computed(() => (value: boolean) => {
                     v-if="client.state == false"
                     class="dropdown-item"
                     @click="changeState(client.id, !client.state)"
-                    ><i class="bx bx-trash me-1"> Activar</i>
+                    ><i class="bx bx-trash me-1"> </i>Activar
                   </a>
                   <a
                     v-if="client.state"

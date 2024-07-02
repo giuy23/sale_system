@@ -7,7 +7,7 @@ import { SubCategory } from "@/types";
 import { Provider } from "@/types";
 import { useProduct } from "@/composables/useProduct";
 
-const { createProduct, updateProduct } = useProduct();
+const { createProduct, updateProduct, loading } = useProduct();
 const { getSearchData } = useSearch();
 const props = defineProps<{
   product: Product | null;
@@ -33,7 +33,7 @@ const initialProduct: Product = {
   provider_id: 0,
 
   image: "",
-  images: [],
+  // images: [],
 };
 const modalRef = ref(false);
 const subCategories = ref<SubCategory[]>();
@@ -50,8 +50,7 @@ const providers = ref<Provider[]>();
 
 // const images = ref<ImageFile[]>([]);
 const images = ref([]);
-// const image = ref<File | null>(null);
-const image = ref();
+const image = ref<File | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
 let productForm = reactive({ ...initialProduct });
 
@@ -192,7 +191,7 @@ const handleInputOneImage = (e: Event) => {
                 class="form-control"
                 placeholder="Escriba el nombre"
                 v-model="productForm.name"
-
+                required
               />
             </div>
             <div class="col-12 col-md-6 mb-3">
@@ -203,7 +202,7 @@ const handleInputOneImage = (e: Event) => {
                 class="form-control"
                 placeholder="Escriba el nombre"
                 v-model="productForm.bar_code"
-
+                required
               />
             </div>
             <div class="col-12 mb-3">
@@ -228,7 +227,7 @@ const handleInputOneImage = (e: Event) => {
                 v-model="productForm.purchase_price"
                 min="0"
                 step="0.01"
-
+                required
               />
             </div>
             <div class="col-12 col-md-6 mb-3">
@@ -243,12 +242,12 @@ const handleInputOneImage = (e: Event) => {
                 v-model="productForm.sale_price"
                 min="0"
                 step="0.01"
-
+                required
               />
             </div>
 
             <div class="col-12 col-md-6 mb-3">
-              <label for="quantity" class="form-label">Cantidad</label>
+              <label for="quantity" class="form-label">Cantidad *</label>
               <input
                 type="number"
                 id="quantity"
@@ -256,7 +255,7 @@ const handleInputOneImage = (e: Event) => {
                 placeholder="Escriba el nombre"
                 v-model="productForm.quantity"
                 min="1"
-
+                required
               />
             </div>
             <div class="col-12 col-md-6 mb-3">
@@ -270,7 +269,6 @@ const handleInputOneImage = (e: Event) => {
                 placeholder="Escriba el nombre"
                 v-model="productForm.minimum_quantity"
                 min="1"
-
               />
             </div>
             <div class="col-12 col-md-6 mb-3">
@@ -285,14 +283,14 @@ const handleInputOneImage = (e: Event) => {
                 :clearable="false"
                 @search="getSubCategoriesVueSelect"
               >
-                <!-- <template #search="{ attributes, events }">
+                <template #search="{ attributes, events }">
                   <input
                     class="vs__search"
                     :required="!productForm.sub_category_id"
                     v-bind="attributes"
                     v-on="events"
                   />
-                </template> -->
+                </template>
                 <template #no-options="{ search }">
                   <span>No hay Resultados para {{ search }}</span>
                 </template>
@@ -310,14 +308,14 @@ const handleInputOneImage = (e: Event) => {
                 :clearable="false"
                 @search="getProvidersVueSelect"
               >
-                <!-- <template #search="{ attributes, events }">
+                <template #search="{ attributes, events }">
                   <input
                     class="vs__search"
                     :required="!productForm.provider_id"
                     v-bind="attributes"
                     v-on="events"
                   />
-                </template> -->
+                </template>
                 <template #no-options="{ search }">
                   <span>No hay Resultados para {{ search }}</span>
                 </template>
@@ -335,7 +333,6 @@ const handleInputOneImage = (e: Event) => {
                 class="form-control"
                 @input="handleInputOneImage"
                 ref="fileInput"
-
               />
             </div>
           </div>
@@ -363,7 +360,7 @@ const handleInputOneImage = (e: Event) => {
           >
             Cerrar
           </button>
-          <button type="submit" class="btn btn-primary">Guardar</button>
+          <button type="submit" :disabled="loading" class="btn btn-primary">Guardar</button>
         </div>
       </form>
     </div>

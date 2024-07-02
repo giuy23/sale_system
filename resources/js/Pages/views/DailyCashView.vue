@@ -37,18 +37,21 @@ const openModal = () => {};
 const handleCreated = (data: DailyCash) => {
   dailyCashes.value!.unshift(data);
   disabledBtnCreate.value = true;
+  toastSuccess("Caja creada con éxito");
 };
 
 const changeStateCashRegister = async (id: number, state: boolean) => {
-  console.log(id, state);
-  console.log(!state);
-
-  const { success, data } = await changeStateDailyCash(id, !state);
+  const { success, data } = await changeStateDailyCash(id, state);
   if (success) {
     const findIndex = dailyCashes.value!.findIndex((el) => el.id === id);
     if (findIndex !== -1) {
       dailyCashes.value![findIndex] = data!;
     }
+    console.log(state);
+
+    state
+      ? toastSuccess("Caja Cerrada con éxito")
+      : toastSuccess("Caja Abierta con éxito");
   }
 };
 
@@ -101,7 +104,19 @@ const handleCreateExpense = (data: Expense) => {
         </button>
       </div>
     </div>
-
+    <div v-if="!disabledBtnCreate" class="row mb-3">
+      <div class="col-12">
+        <div class="card bg-warning text-white mb-3 text-center">
+          <div class="card-header">Caja no Abierta</div>
+          <div class="card-body">
+            <p class="card-text">
+              No Haz Abierto una Caja Hoy. Para Realizar una Venta Debes Abrir
+              Una.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
     <DailyCashList
       :daily-cashes="dailyCashes!"
       @close-cash="changeStateCashRegister"

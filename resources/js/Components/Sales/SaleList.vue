@@ -20,8 +20,10 @@ const state = computed(() => (value: number) => {
     tag = "<span class='text-info fw-bolder'>Pagado</span>";
   } else if (value === 2) {
     tag = "<span class='text-danger fw-bolder'>Anulado</span>";
-  } else {
+  } else if (value === 3) {
     tag = "<span class='text-warning fw-bolder'>Crédito</span>";
+  } else {
+    tag = "<span class='text-primary fw-bolder'>Crédito Pagado</span>";
   }
   return tag;
 });
@@ -75,8 +77,8 @@ const state = computed(() => (value: number) => {
                   >
                   <a
                     class="dropdown-item"
-                    type="button"
-                    @click="route('sale.detail', sale.id)"
+                    type="button" target="_blank"
+                    :href="route('sale.detailSale', sale.id)"
                     ><i class="bx bx-edit-alt me-1"></i> Ver Detalles</a
                   >
                 </div>
