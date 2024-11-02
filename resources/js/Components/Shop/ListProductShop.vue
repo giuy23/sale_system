@@ -143,7 +143,7 @@ const enterDiscount = (product: ProductToSell) => {
           <div class="col-12 d-flex justify-content-end">
             <button
               class="btn btn-success me-3"
-              :disabled="Number(total) === 0"
+              :disabled="products.length === 0"
             >
               <a
                 class="dropdown-item"

@@ -11,6 +11,7 @@ const props = defineProps<{
 const emits = defineEmits<{
   closeCash: [id: number, state: boolean];
   createExpense: [id: number, type: number];
+  export: [string];
 }>();
 
 const changeStateCashRegister = (id: number, state: boolean) => {
@@ -22,8 +23,8 @@ const createExpense = (id: number, type: number) => {
 };
 
 const redirectViewExpense = (id: number) => {
-  getExpenses(id)
-}
+  getExpenses(id);
+};
 
 const state = computed(() => (value: boolean) => {
   let tag;
@@ -32,11 +33,51 @@ const state = computed(() => (value: boolean) => {
     : (tag = "<span class='text-danger fw-bolder'>Cerrado</span>");
   return tag;
 });
+
+const handleExport = (type: string) => {
+  emits("export", type);
+};
 </script>
 
 <template>
   <div class="card">
-    <h5 class="card-header">Striped rows</h5>
+    <div class="row">
+      <div class="col-6">
+        <h5 class="card-header">Striped rows</h5>
+      </div>
+      <div class="col-6 d-flex justify-content-end align-items-center px-4">
+        <div class="btn-group" id="dropdown-icon-demo">
+          <button
+            type="button"
+            class="btn btn-primary dropdown-toggle"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            <i class="bx bx-menu"></i> Exportar
+          </button>
+          <ul class="dropdown-menu">
+            <li>
+              <a
+                @click="handleExport('excel')"
+                class="dropdown-item d-flex align-items-center"
+                ><i class="bx bx-chevron-right scaleX-n1-rtl"></i>Excel</a
+              >
+            </li>
+            <!-- <li>
+              <hr class="dropdown-divider" />
+            </li> -->
+            <li>
+              <a
+                @click="handleExport('pdf')"
+                class="dropdown-item d-flex align-items-center"
+                ><i class="bx bx-chevron-right scaleX-n1-rtl"></i>PDF</a
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
     <div class="table-responsive text-nowrap">
       <table class="table table-striped">
         <thead>
@@ -104,7 +145,7 @@ const state = computed(() => (value: boolean) => {
                   <a
                     v-if="dailyCash.state"
                     class="dropdown-item"
-                    :href="route('expense.index', {id: dailyCash.id})"
+                    :href="route('expense.index', { id: dailyCash.id })"
                     ><i class="bx bx-trash me-1"></i> Ver Gastos</a
                   >
                   <!-- <a

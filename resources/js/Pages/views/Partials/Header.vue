@@ -59,7 +59,7 @@ const handleLogout = async () => {
             <div class="avatar avatar-online">
               <img
                 :src="`storage/images/users/${$page.props.auth.image}`"
-                class="w-px-40 h-auto rounded-circle"
+                class="w-px-40 rounded-circle"
               />
             </div>
           </a>

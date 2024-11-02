@@ -17,12 +17,14 @@
 -> SUB CATEGORIE -> Al borrar una subcategoría los productos que le pertenezcan auntomaticamente pasan a estas desactivados.
 
 
-loading in btn save Shop and Cancel Shop Confirmation
-
 client no can delete from table
-->el descuento no debe ser mayor al precio del producto
 
 ->crear un egreso con movito de devolución de dinero de tal venta
 
+-> PAGAR DEUDA -> redondear al crear un egreso (en ganancia)
+-> SALE -> poner un nro de serie
 
-->ver eso de cuando se envía doble cuando la venta falla.
+
+--------------------------------
+ClientRequest.php === FormClient === ClientList  => Se quitó el dni obligatorio y el tipo se cambió a texto
+ProductRequest.php === FormClient === ProductList => Se quitó el dni obligatorio y el tipo se cambió a texto

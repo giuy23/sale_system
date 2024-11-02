@@ -20,6 +20,6 @@ class ClientSeeder extends Seeder
       'state' => 1,
     ]);
 
-    Client::factory(20)->create();
+    // Client::factory(20)->create();
   }
 }

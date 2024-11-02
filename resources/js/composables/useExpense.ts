@@ -1,4 +1,4 @@
-import { Expense } from "@/types";
+import { Expense, SearchByDate } from "@/types";
 import axios from "axios";
 import { ref } from "vue";
 
@@ -75,6 +75,43 @@ export function useExpense() {
     }
   };
 
+  const exportDataReportDailyExpenses = async (
+    type: string,
+    payload: SearchByDate
+  ) => {
+    try {
+      const response = await axios({
+        url: `${route("expense.export")}?type=${type}`,
+        responseType: "blob",
+        params: { ...payload },
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+
+      if (type === "excel") {
+        link.setAttribute(
+          "download",
+          `movimiento-del-dia-${payload.start_date}.xlsx`
+        );
+      } else if (type === "pdf") {
+        link.setAttribute(
+          "download",
+          `movimiento-del-dia-${payload.start_date}.pdf`
+        );
+      }
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      return { success: true };
+    } catch (error) {
+      return { success: false };
+    }
+  };
+
   return {
     loading,
     balance,
@@ -83,5 +120,6 @@ export function useExpense() {
     createExpense,
     updateExpense,
     getBalanceToday,
+    exportDataReportDailyExpenses,
   };
 }

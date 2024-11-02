@@ -18,6 +18,9 @@ class RoleMiddleware
    */
   public function handle(Request $request, Closure $next, ...$roles): Response
   {
+    if (Auth::check() && in_array(Auth::user()->role_id, haystack: [3])) {
+      return redirect(route('client.view', absolute: false));
+    }
     if (Auth::check() && in_array(Auth::user()->role_id, $roles)) {
       return $next($request);
     }

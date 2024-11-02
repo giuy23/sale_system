@@ -23,7 +23,8 @@ class ClientRequest extends FormRequest
   {
     return [
       'full_name' => ['required', 'string', 'max:160'],
-      'document_number' => ['required', 'numeric', 'digits:8', 'unique:clients,document_number,' . $this->id],
+      // 'document_number' => ['required', 'numeric', 'digits:8', 'unique:clients,document_number,' . $this->id],
+      'document_number' => ['nullable', 'numeric', 'digits:8', 'unique:clients,document_number,' . $this->id],
       'cell_phone' => ['nullable', 'numeric', 'digits:9'],
       'state' => ['nullable', 'boolean'],
     ];

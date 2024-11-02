@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { confirmAction } from "@/Components/utils/toast";
+import { confirmAction, redirectToast } from "@/Components/utils/toast";
 import { CreditSaleClient, ClientTotalDebt } from "@/types/index";
 import FormPayDebt from "./FormPayDebt.vue";
 import { ref } from "vue";
 import { useSale } from "@/composables/useSale";
-import { watch } from "vue";
+import { toastSuccess } from "@/Components/utils/toast";
 
 const { payAllDebts } = useSale();
 const saleCredits = ref<CreditSaleClient[]>([]);
@@ -33,10 +33,13 @@ const handlePayAllDebts = async () => {
     id: el.id,
   }));
 
-  console.log(creditSaleIds);
+  console.log(saleCredits.value);
 
   if (isConfirmed) {
     const { success } = await payAllDebts(creditSaleIds);
+    if (success) {
+      redirectToast("Pago Total de Deudas Exitosa", "saleCredit");
+    }
   }
 };
 
@@ -61,6 +64,7 @@ const updateAmountToSaleCredits = (data: { id: number; amount: number }) => {
       : (saleCredits.value[findIndex].remaining_amount = newAmount);
 
     updateAmountTotalDebt(data.amount);
+    toastSuccess("Monto ingresado con éxito");
   }
 };
 
@@ -136,9 +140,8 @@ console.log(saleCredits.value);
                   <a
                     class="dropdown-item"
                     type="button"
-                    data-bs-toggle="modal"
-                    data-bs-target="#ViewProductsInSale"
-                    @click="createPayment(credit)"
+                    target="_blank"
+                    :href="route('sale.detailSale', credit.sale_id)"
                     ><i class="bx bx-edit-alt me-1"></i> Ver Productos
                     Comprados</a
                   >

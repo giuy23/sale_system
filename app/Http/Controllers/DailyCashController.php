@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\DailyCashExport;
 use App\Http\Requests\DailyCashRequest;
 use App\Http\Requests\DailyCashStoreRequest;
 use App\Http\Requests\DailyCashUpdateRequest;
@@ -12,6 +13,8 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class DailyCashController extends Controller
 {
@@ -23,9 +26,20 @@ class DailyCashController extends Controller
    */
   public function index(Request $request)
   {
-    $dailyCashes = DailyCash::query()->filterData($request)
+    $dailyCashes = DailyCash::query()
+      ->filterByDate($request)
+      ->when($request->filled('minimum_amount'), function ($query) use ($request) {
+        $min_amount = $request->minimum_amount;
+        $query->where('final_money', '>=', $min_amount);
+      })
+      ->when($request->filled('maximum_amount'), function ($query) use ($request) {
+        $max_amount = $request->maximum_amount;
+        $query->where('final_money', '<=', $max_amount);
+      })
       ->latest()->paginate(15);
-
+    if ($request->wantsJson()) {
+      return DailyCashResource::collection($dailyCashes)->response();
+    }
     return Inertia::render('views/DailyCashView', [
       'dailyCashes' => DailyCashResource::collection($dailyCashes),
     ]);
@@ -107,13 +121,30 @@ class DailyCashController extends Controller
   public function getProfit()
   {
     $dailyCash = $this->dailyCashService->searchDailyCashCurrent();
-    // dd($dailyCash);
     $profit = $dailyCash->profit ?? -1; //-1 -> Caja no abierta
-    // if ($profit == null) {
-    //   $profit = -1;
-    // }
-    // dd($profit, $profit == -1);
-
     return response()->json($profit);
+  }
+
+  public function exportData(Request $request)
+  {
+    $dailyCashes = DailyCash::query()
+      ->filterByDate($request)
+      ->when($request->filled('minimum_amount'), function ($query) use ($request) {
+        $min_amount = $request->minimum_amount;
+        $query->where('final_money', '>=', $min_amount);
+      })
+      ->when($request->filled('maximum_amount'), function ($query) use ($request) {
+        $max_amount = $request->maximum_amount;
+        $query->where('final_money', '<=', $max_amount);
+      })
+      ->select(['start_money', 'final_money', 'profit', 'state', 'user_id', 'created_at'])
+      ->latest()
+      ->get();
+    if ($request->type === "excel") {
+      return (new DailyCashExport($dailyCashes))->download('dailyCashes.xlsx', Excel::XLSX, ['Content-Type' => 'text/xlsx']);
+    } else if ($request->type === "pdf") {
+      $pdf = PDF::loadView('exports.dailyCash', ['dailyCashes' => $dailyCashes]);
+      return $pdf->download('dailyCash.pdf');
+    }
   }
 }

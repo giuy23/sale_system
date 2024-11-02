@@ -2,6 +2,7 @@
 
 namespace App\Traits;
 
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Laravolt\Avatar\Facade as Avatar;
 
@@ -37,6 +38,18 @@ trait ImageTrait
     Storage::disk('public')->delete($path . '/' . $oldImage);
 
     return $imageName;
+  }
+
+  public function editImageEnterprise($image)
+  {
+    $imageName = 'image-enterprise.jpg';
+
+    $oldImagePath = public_path('assets/img/layouts' . '/' . $imageName);
+    if (File::exists($oldImagePath)) {
+      File::delete($oldImagePath);
+    }
+
+    $image->move(public_path('assets/img/layouts'), $imageName);
   }
 
   public function deleteImage($model, $path)

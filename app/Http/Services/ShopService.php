@@ -3,13 +3,19 @@
 namespace App\Http\Services;
 
 use App\Models\CreditSale;
+use App\Models\Enterprise;
 use App\Models\PaymentHistory;
 use App\Models\Product;
 use App\Models\ProductSale;
 use App\Models\Sale;
+use Barryvdh\DomPDF\Facade\PDF;
+use Dompdf\Dompdf;
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Writer\PngWriter;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use PhpParser\Node\Stmt\TryCatch;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ShopService
 {
@@ -26,20 +32,25 @@ class ShopService
         ->where('id', $product['id'])
         ->first();
 
-      if ($productPrice['quantity'] < $product['quantitySell']) {
-        return ['error' => 'Cantidad del producto insuficiente'];
+      if (!$productPrice) {
+        return ['error' => 'Producto no encontrado'];
+      }
+
+      if ($productPrice->quantity < $product['quantitySell']) {
+        return ['error' => 'Cantidad del producto insuficiente para ' . $productPrice->name];
       }
 
       $product['sale_price'] = $productPrice->sale_price;
       $product['original_quantity'] = $productPrice->quantity;
       $product['name'] = $productPrice->name;
-      $product['total'] = number_format(($productPrice->sale_price - $product['discount']) * $product['quantitySell'], 2);
-      $product['discount_total'] = number_format($product['discount'] * $product['quantitySell'], 2);
+      $product['total'] = number_format(($productPrice->sale_price - floatval($product['discount'])) * $product['quantitySell'], 2, '.', '');
+      $product['discount_total'] = number_format(floatval($product['discount']) * $product['quantitySell'], 2, '.', '');
+
       $productsWithPrice[] = $product;
     }
-
     return $productsWithPrice;
   }
+
 
   public function calculateTotalAmountSale($products)
   {
@@ -48,12 +59,14 @@ class ShopService
     $productFinal = [];
 
     foreach ($products as $product) {
-      $totalPrice += $product['total'];
-      $totalDiscount += $product['discount_total'];
+      // Convertir los totales a números flotantes quitando las comas
+      $totalPrice += floatval(str_replace(',', '', $product['total']));
+      $totalDiscount += floatval(str_replace(',', '', $product['discount_total']));
     }
-    $productFinal['total'] = $totalPrice;
+
+    $productFinal['total'] = number_format($totalPrice, 2, '.', '');
     $productFinal['igv'] = number_format($totalPrice * 0.18, 2, '.', '');
-    $productFinal['sub_total'] = number_format(($totalPrice - ($totalPrice * 0.18)), 2, '.', ''); //IGV -> 18%
+    $productFinal['sub_total'] = number_format($totalPrice - ($totalPrice * 0.18), 2, '.', ''); // IGV -> 18%
     $productFinal['discount_total'] = number_format($totalDiscount, 2, '.', '');
 
     return $productFinal;
@@ -130,5 +143,87 @@ class ShopService
     } catch (\Exception $th) {
       return response()->json(['message' => 'Error al crear la venta.'], 500);
     }
+  }
+
+  public function createTicket($sale)
+  {
+    $sales = ProductSale::where('sale_id', $sale->id)->get();
+    $enterprise = Enterprise::first();
+    $qrCode = $this->createQR($sale, $enterprise);
+
+    $html = view(
+      'pdf.detail-sale',
+      ['sales' => $sales, 'enterprise' => $enterprise, 'sale' => $sale, 'qrCode' => $qrCode]
+    )->render();
+
+    $pdf = new Dompdf();
+    $options = $pdf->getOptions();
+    $pdf->setPaper('b7', 'portrait');
+
+    $options->set(
+      array(
+        'isRemoteEnabled' => true,
+        'isHtml5ParserEnabled' => true
+      )
+    );
+    $pdf->setOptions($options);
+    $pdf->loadHtml($html);
+
+    $GLOBALS['bodyHeight'] = 0;
+
+    $pdf->setCallbacks([
+      'myCallbacks' => [
+        'event' => 'end_frame',
+        'f' => function ($frame) {
+          $node = $frame->get_node();
+
+          if (strtolower($node->nodeName) === "body") {
+            $padding_box = $frame->get_padding_box();
+            $GLOBALS['bodyHeight'] += $padding_box['h'];
+          }
+        }
+      ]
+    ]);
+
+    $pdf->render();
+    unset($pdf);
+    $docHeight = $GLOBALS['bodyHeight'] + 100;
+
+    $pdf = new Dompdf($options);
+    $options = $pdf->getOptions();
+    $pdf->setPaper([0, 0, 500, $docHeight], 'portrait');
+    $pdf->loadHtml($html);
+    $pdf->render();
+    return $pdf->stream('detail-sale.pdf', ['Attachment' => 0]);
+
+    //SI LA TICKETERA CORTA EXACTO USAR ESTO
+    // $pdf = \App::make('dompdf.wrapper');
+    // return view('pdf.detail-sale', compact('sales', 'enterprise'));
+  }
+
+  private function createQR($sale, $enterprise)
+  {
+    $data = [
+      $enterprise->ruc ?? 00000000000,
+      03,//TIPO DE COMPROBANTE -> BOLETA
+      env("RUC_SERIE"),
+      str_pad($sale->id, 7, '0', STR_PAD_LEFT),
+      $sale->total,
+      $sale->created_at->format('Y-m-d'),
+      01,
+      $sale->client_document_number,
+    ];
+
+    $qrString = implode('|', $data);
+    $result = Builder::create()
+      ->writer(new PngWriter())
+      ->data($qrString)
+      ->size(200)
+      ->margin(10)
+      ->build();
+
+    $qrCode = base64_encode($result->getString());
+
+    return $qrCode;
   }
 }

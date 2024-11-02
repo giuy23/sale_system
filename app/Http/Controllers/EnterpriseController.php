@@ -77,6 +77,7 @@ class EnterpriseController extends Controller
 
     if ($request->hasFile('image')) {
       $urlImage = $enterprise->editImage($request->image, $enterprise, Enterprise::path);
+      $enterprise->editImageEnterprise($request->image);
       $enterprise->image = $urlImage;
     }
 

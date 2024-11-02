@@ -8,9 +8,11 @@ import FormExpense from "@/Components/Expenses/FormExpense.vue";
 import { ref, watch } from "vue";
 import { useDailyCash } from "@/composables/useDailyCash";
 import { toastSuccess } from "@/Components/utils/toast";
+import SearchByDate from "@/Components/common/SearchByDate.vue";
+import { onMounted } from "vue";
 
 const dailyCashes = ref<DailyCash[]>();
-const links = ref<Object>();
+const links = ref();
 const ModalIsOpen = ref(false);
 const disabledBtnCreate = ref(false);
 const expense = ref<CreateExpense>({
@@ -18,7 +20,16 @@ const expense = ref<CreateExpense>({
   type: 1,
 });
 
-const { changeStateDailyCash } = useDailyCash();
+const cleanupLocalStorage = () => {
+  const url = window.location.href;
+  const saleIndexUrl = route("dailyCash.index");
+
+  if (url === saleIndexUrl) {
+    localStorage.removeItem("searchDataCash");
+  }
+};
+
+const { changeStateDailyCash, exportData } = useDailyCash();
 const props = defineProps<{
   dailyCashes: GetDataWithParams;
 }>();
@@ -28,15 +39,22 @@ watch(
   (value) => {
     dailyCashes.value = value.data;
     links.value = value.meta.links;
+    cleanupLocalStorage();
   },
   { immediate: true }
 );
 
+onMounted(() => {
+  verifyCashIsOpenToday();
+});
+
 const openModal = () => {};
+const today = new Date().toISOString().split("T")[0];
 
 const handleCreated = (data: DailyCash) => {
   dailyCashes.value!.unshift(data);
   disabledBtnCreate.value = true;
+  localStorage.setItem("cash", JSON.stringify({ date: today, is_open: true }));
   toastSuccess("Caja creada con éxito");
 };
 
@@ -56,12 +74,17 @@ const changeStateCashRegister = async (id: number, state: boolean) => {
 };
 
 const verifyCashIsOpenToday = () => {
-  const today = new Date().toISOString().split("T")[0];
-  const cashDate = dailyCashes.value![0].created_at.split(" ")[0];
-  today === cashDate ? (disabledBtnCreate.value = true) : "";
-};
+  let savedData = JSON.parse(localStorage.getItem("cash") || "{}");
 
-verifyCashIsOpenToday();
+  if (!savedData.date || savedData.date !== today) {
+    localStorage.setItem(
+      "cash",
+      JSON.stringify({ date: today, is_open: false })
+    );
+    savedData = { date: today, is_open: false };
+  }
+  disabledBtnCreate.value = savedData.is_open;
+};
 
 const createExpense = (id: number, type: number) => {
   expense.value = { id, type };
@@ -80,6 +103,15 @@ const handleCreateExpense = (data: Expense) => {
   }
 
   toastSuccess("Monto actualizado con éxito");
+};
+
+const showSearchedData = (data: GetDataWithParams) => {
+  dailyCashes.value = data.data;
+  links.value = data.meta.links;
+};
+
+const handleExportData = async (type: string) => {
+  await exportData(type, "searchDataCash");
 };
 </script>
 
@@ -117,17 +149,25 @@ const handleCreateExpense = (data: Expense) => {
         </div>
       </div>
     </div>
+
+    <SearchByDate
+      model="dailyCash"
+      @data-searched="showSearchedData"
+      storage="searchDataCash"
+    />
+
     <DailyCashList
       :daily-cashes="dailyCashes!"
       @close-cash="changeStateCashRegister"
       @create-expense="createExpense"
+      @export="handleExportData"
     />
 
     <FormDailyCash :reset="ModalIsOpen" @created="handleCreated" />
 
     <FormExpense :create-expense="expense!" @created="handleCreateExpense" />
 
-    <Pagination :links="links" />
+    <Pagination :links="links" storage="searchDataCash" />
   </Layout>
 </template>
 

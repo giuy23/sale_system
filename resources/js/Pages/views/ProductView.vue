@@ -16,7 +16,7 @@ import {
 const modalIsOpen = ref(false);
 const products = ref<Product[]>();
 const product = ref<Product | null>(null);
-const links = ref<Object>();
+const links = ref();
 
 const { deleteProduct, changeState } = useProduct();
 const props = defineProps<{
@@ -62,7 +62,6 @@ const editProduct = async (data: Product) => {
 
 const handleChangeState = async (id: number, state: boolean) => {
   const isConfirmed = await confirmAction();
-  console.log(isConfirmed);
 
   if (isConfirmed === true) {
     const { success, data } = await changeState(id, state);
@@ -131,7 +130,7 @@ const handleDeleteProduct = async (id: number) => {
       @change-state="handleChangeState"
     />
 
-    <Pagination :links="links" />
+    <Pagination :links="links!" />
   </Layout>
 </template>
 

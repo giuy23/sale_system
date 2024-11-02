@@ -5,8 +5,6 @@ import { computed, ref } from "vue";
 const saleDetails = ref<SaleDetails[]>([]);
 
 const confirmCancelSale = async () => {
-  console.log("xd");
-
   try {
     const { data } = await axios({
       method: "POST",
@@ -17,7 +15,7 @@ const confirmCancelSale = async () => {
       },
     });
 
-    return { success: true, data };
+    return { success: true, data: data.message };
   } catch (error) {
     return { success: false };
   } finally {
@@ -27,7 +25,8 @@ const confirmCancelSale = async () => {
 export function useCancelSale() {
   const subTotal = computed(() => (data: SaleDetails) => {
     const price = data.price - data.discount;
-    return (data.total = data.quantity * price - data.quantitySell! * price).toFixed(2);
+    return (data.total =
+      data.quantity * price - data.quantitySell! * price).toFixed(2);
   });
 
   const amountToReturn = computed(() => {

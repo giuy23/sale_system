@@ -76,3 +76,31 @@ export const confirmDelete = (msg?: string): Promise<boolean> => {
     });
   });
 };
+
+export const redirectToast = (msg: string, url?: string) => {
+  let timerInterval: any;
+  Swal.fire({
+    title: msg ?? "",
+    html: "Redireccionando en <b></b> milisegundos.",
+    timer: 1000,
+    timerProgressBar: true,
+    didOpen: () => {
+      Swal.showLoading();
+      const timer = Swal.getPopup()!.querySelector("b");
+      timerInterval = setInterval(() => {
+        timer!.textContent = `${Swal.getTimerLeft()}`;
+      }, 100);
+    },
+    willClose: () => {
+      clearInterval(timerInterval);
+    },
+  }).then((result) => {
+    if (result.dismiss === Swal.DismissReason.timer) {
+      if (url) {
+        window.location.href = route(`${url}.index`);
+      } else {
+        history.back();
+      }
+    }
+  });
+};

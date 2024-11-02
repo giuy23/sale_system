@@ -114,7 +114,7 @@ export type DailyCash = {
 export type Client = {
   id: number;
   full_name: string;
-  document_number: number;
+  document_number: number | null;
   cell_phone: number | null;
   state?: boolean;
 };
@@ -179,6 +179,14 @@ export type ClientTotalDebt = {
   full_name: string;
   total_debt: number;
 };
+
+export type SearchByDate = {
+  start_date: string,
+  end_date: string,
+  minimum_amount?: number | null;
+  maximum_amount?: number | null;
+
+}
 
 export type DailyCashCreate = Pick<DailyCash, "id" | "start_money">;
 export type DailyCashCompare = Pick<

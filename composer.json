@@ -7,12 +7,14 @@
     "require": {
         "php": "^8.2",
         "barryvdh/laravel-dompdf": "^2.2",
+        "endroid/qr-code": "^5.0",
         "inertiajs/inertia-laravel": "^1.0",
         "laravel/breeze": "^2.0",
         "laravel/framework": "^11.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "laravolt/avatar": "^5.1",
+        "maatwebsite/excel": "^3.1",
         "tightenco/ziggy": "^2.0"
     },
     "require-dev": {

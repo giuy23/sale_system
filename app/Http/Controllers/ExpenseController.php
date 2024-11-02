@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ExpenseExport;
 use App\Http\Requests\ExpenseRequest;
 use App\Http\Resources\ExpenseResource;
 use App\Http\Services\DailyCashService;
@@ -9,6 +10,8 @@ use App\Models\Expense;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ExpenseController extends Controller
 {
@@ -100,5 +103,26 @@ class ExpenseController extends Controller
     $entries = number_format($entries->sum('amount') ?? 0, 2);
     $exits = number_format($exits->sum('amount') ?? 0, 2);
     return response()->json(['entries' => $entries, 'exits' => $exits]);
+  }
+
+  public function exportData(Request $request)
+  {
+    $expenses = Expense::query()
+      ->filterByDate($request)
+      ->select([
+        'amount',
+        'description',
+        'type',
+        'created_at',
+      ])
+      ->latest()
+      ->get();
+
+    if ($request->type === "excel") {
+      return (new ExpenseExport($expenses))->download('invoices.xlsx', Excel::XLSX, ['Content-Type' => 'text/xlsx']);
+    } else if ($request->type === "pdf") {
+      $pdf = PDF::loadView('exports.expenses', ['expenses' => $expenses]);
+      return $pdf->download('invoices.pdf');
+    }
   }
 }

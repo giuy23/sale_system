@@ -21,8 +21,8 @@ class SaleResource extends JsonResource
           'total' => floatval($this->total),
           'igv' => floatval($this->igv),
           'state' => intval($this->state),
-          'user_name' => ($this->user->name . ', ' . $this->user->surname),
-          'client_name' => $this->client->full_name
+          'user_name' => isset($this->user) ? ($this->user->name . ', ' . $this->user->surname) ?? 'USUARIO ELIMINADO' : 'USUARIO ELIMINADO',
+          'client_name' => $this->client->full_name  ?? 'CLIENTE ELIMINADO',
         ];
     }
 }

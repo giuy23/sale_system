@@ -10,6 +10,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProviderController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\SaleController;
+use App\Http\Controllers\SaleDetailController;
 use App\Http\Controllers\SubCategoryController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
@@ -24,10 +25,17 @@ Route::get('/', function () {
     'phpVersion' => PHP_VERSION,
   ]);
 });
+Route::get('/a', function () {
+  return Inertia::render('Auth/VerifyEmail');
+});
 
 Route::get('/dashboard', function () {
   return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth', 'verified', 'role: 1,2'])->name('dashboard');
+
+Route::get('/client-view', function () {
+  return Inertia::render('Client');
+})->middleware(['auth', 'verified'])->name('client.view');
 
 Route::middleware('auth')->group(function () {
   Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -61,23 +69,27 @@ Route::middleware('auth')->group(function () {
     Route::get('/sale-detail/{sale}', 'getSaleDetail')->name('sale.detail')->middleware('role:1,2');
     Route::get('/detail-sale/{sale}', 'getDetailSalePdf')->name('sale.detailSale')->middleware('role:1,2');
     Route::get('/sale-total-amount', 'getAmountTotalSalesToday')->name('sale.totalSales')->middleware('role:1,2');
+    Route::get('/sale-export-data', 'exportData')->name('sale.export')->middleware('role:1,2');
     Route::post('/sale-confirm-cancel', 'confirmCancelSale')->name('sale.confirmCancelSale')->middleware('role:1');
   });
 
   Route::controller(CreditSaleController::class)->group(function () {
     Route::get('/debt-client-detail', 'getDebtsFromClient')->name('creditSale.getClientDebts')->middleware('role:1,2');
-    Route::post('/pay-one-debt/{creditSale}', 'payOneDebt')->name('creditSale.payOneDebt')->middleware('role:1');
-    Route::post('/pay-one-debt', 'payAllDebts')->name('creditSale.payAllDebt')->middleware('role:1');
+    Route::post('/pay-one-debt/{creditSale}', 'payOneDebt')->name('creditSale.payOneDebt')->middleware('role:1,2');
+    Route::post('/pay-all-debts', 'payAllDebts')->name('creditSale.payAllDebt')->middleware('role:1');
   });
 
   Route::controller(DailyCashController::class)->group(function () {
     Route::get('/daily-cash-last-cashes', 'getLastDailyCashes')->name('dailyCash.getLastCashes')->middleware('role:1,2');
+    Route::get('/daily-cash-export', 'exportData')->name('dailyCash.export')->middleware('role:1,2');
     Route::get('/daily-cash-profit', 'getProfit')->name('dailyCash.profit')->middleware('role:1,2');
     Route::put('/status-daily-cash/{dailyCash}', 'changeStatus')->name('dailyCash.status')->middleware('role:1,2');
   });
 
   Route::controller(ExpenseController::class)->group(function () {
     Route::get('expense-balance', 'getBalance')->name('expense.balance')->middleware('role:1,2');
+    Route::get('/expense-export-data', 'exportData')->name('expense.export')->middleware('role:1,2');
+
   });
 
   Route::controller(ShopController::class)->group(function () {
@@ -101,6 +113,7 @@ Route::middleware('auth')->group(function () {
   Route::resource('shop', ShopController::class)->middleware('role:1,2');
   Route::resource('sale', SaleController::class)->middleware('role:1,2');
   Route::resource('saleCredit', CreditSaleController::class)->middleware('role:1,2');
+  Route::resource('saleDetail', SaleDetailController::class)->middleware('role:1,2');
 });
 
 

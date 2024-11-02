@@ -3,6 +3,7 @@
 namespace App\Http\Services;
 
 use App\Models\DailyCash;
+use App\Models\Expense;
 use App\Models\Product;
 use App\Models\ProductSale;
 use App\Models\Sale;
@@ -17,16 +18,20 @@ class CancelSale
     private ShopService $shopService,
     private DailyCashService $dailyCashService,
   ) {
+    $this->dailyCashCurrent = $this->dailyCashService->searchDailyCashCurrent();
   }
+
+
+  public $dailyCashCurrent;
 
   public function verifyMoneyEnoughInCurrentBox($products)
   {
-    $total = $this->calculateTotalAmount($products);
-    $cashIsOpen = $this->dailyCashService->searchDailyCashCurrent();
-    if ($cashIsOpen->final_money < $total) {
+    $total = $this->calculateAmountToReturned($products);
+
+    if ($this->dailyCashCurrent->final_money < $total) {
       return false;
     }
-    return true;
+    return $total;
   }
 
   public function returnProductsToSale($products)
@@ -53,6 +58,7 @@ class CancelSale
 
   public function verifyNewSale($products, $clientId)
   {
+    DB::beginTransaction();
     try {
       $productsToSale = [];
       foreach ($products as $product) {
@@ -65,32 +71,42 @@ class CancelSale
       if (!empty($productsToSale)) {
         $totalAmount = $this->shopService->calculateTotalAmountSale($productsToSale);
         $sale = $this->shopService->saveShopInTableSale($totalAmount, 1, $clientId);
-        if ($sale) {
-          $success = $this->saveShopInTableSaleDetail($productsToSale, $sale['id']);
-          if ($success) {
-            $this->dailyCashService->increaseCashAmountCurrent($totalAmount['total']);
-            $this->shopService->discountQuantityProducts($productsToSale);
-            return response()->json(['message' => 'Venta creada con éxito.'], 200);
-          } else {
-            return response()->json(['message' => 'Error al guardar el detalle de la venta.'], 404);
-          }
+        $success = $this->saveShopInTableSaleDetail($productsToSale, $sale['id']);
+        if ($success) {
+          $this->dailyCashService->increaseCashAmountCurrent($totalAmount['total']);
+          $this->shopService->discountQuantityProducts($productsToSale);
+
+          DB::commit();
+          return response()->json(['message' => 'Venta creada con éxito.'], 200);
         } else {
-          return response()->json(['message' => 'Error al crear la venta.'], 404);
+          return response()->json(['message' => 'Error al guardar el detalle de la venta.'], 404);
         }
       }
+      DB::commit();
       return true;
     } catch (\Exception $e) {
+      DB::rollBack();
       return response()->json(['message' => 'Error al procesar la venta.'], 500);
     }
   }
 
-  public function updateDailyCash($saleId, $products)
+  public function updateDailyCash($saleId)
   {
-    $total = $this->calculateTotalAmount($products);
     $sale = Sale::find($saleId);
-    $dailyCash = DailyCash::whereDate('created_at', $sale->created_at)->first();
+    // $dailyCash = DailyCash::whereDate('created_at', $sale->created_at)->first();
+    // $this->dailyCashService->decreaseCashAmountByInstance($sale->total, $dailyCash);
+    return $sale;
+  }
 
-    $this->dailyCashService->decreaseCashAmountByInstance($total, $dailyCash);
+  public function decreaseAmountCurrentCash($amount, $sale)
+  {
+    Expense::create([
+      'amount' => $amount,
+      'description' => 'Monto devuelvo de la venta N° ' . $sale->id,
+      'type' => 2,
+      'daily_cash_id' => $this->dailyCashCurrent->id,
+    ]);
+    $this->dailyCashService->decreaseCashAmountCurrent($sale->total);
   }
 
   private function saveShopInTableSaleDetail($products, $saleId)
@@ -112,12 +128,13 @@ class CancelSale
     }
   }
 
-  private function calculateTotalAmount($products)
+  private function calculateAmountToReturned($products)
   {
     $total = 0;
     foreach ($products as $product) {
-      $total += $product['total'];
+      $quantity = $product['quantity'] - $product['quantitySell'];
+      $total += ($product['price'] - $product['discount']) * $quantity;
     }
-    return $total;
+    return floatval($total);
   }
 }

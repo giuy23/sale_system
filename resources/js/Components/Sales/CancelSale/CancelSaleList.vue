@@ -2,7 +2,11 @@
 import { SaleDetails } from "@/types";
 import { ref, watch } from "vue";
 import { useCancelSale } from "@/composables/useCancelSale";
-import { confirmAction } from "@/Components/utils/toast";
+import {
+  confirmAction,
+  redirectToast,
+  toastSuccess,
+} from "@/Components/utils/toast";
 
 const { saleDetails, subTotal, amountToReturn, confirmCancelSale } =
   useCancelSale();
@@ -14,12 +18,12 @@ const props = defineProps<{
 watch(
   props.saleDetails,
   (value) => {
+    console.log(value);
+
     saleDetails.value = value.map((el) => ({ ...el, quantitySell: 0 }));
   },
   { immediate: true }
 );
-
-console.log(saleDetails.value);
 
 const increaseQuantity = (sale: SaleDetails) => {
   if (sale.quantitySell === 0) return;
@@ -35,17 +39,28 @@ const handleConfirmCancelSale = async () => {
   const isConfirmed = await confirmAction();
   if (isConfirmed) {
     const { data, success } = await confirmCancelSale();
+    if (success) {
+      redirectToast(data, "sale");
+    }
   }
 };
 </script>
 
 <template>
   <div class="card">
-    <h5 class="card-header">Striped rows</h5>
-    <h5 class="card-header">Monto a Devolver: {{ amountToReturn }}</h5>
-    <button class="btn btn-primary" @click="handleConfirmCancelSale">
-      Confirmar Anulación
-    </button>
+    <div class="row">
+      <div class="col-md-6 col-12">
+        <h5 class="card-header">Striped rows</h5>
+      </div>
+      <div class="col-md-6 col-12 d-flex justify-content-end px-4">
+        <h5 class="card-header">Monto a Devolver: {{ amountToReturn }}</h5>
+      </div>
+    </div>
+    <div class="d-flex justify-content-end align-items-center px-4">
+      <button class="btn btn-primary" @click="handleConfirmCancelSale">
+        Confirmar Anulación
+      </button>
+    </div>
     <div class="table-responsive text-nowrap">
       <table class="table table-striped">
         <thead>

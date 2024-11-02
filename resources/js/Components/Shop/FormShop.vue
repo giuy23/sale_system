@@ -19,9 +19,11 @@ const {
   loading,
   saveSale,
   resetFormValues,
+  viewReceipt
 } = shop();
 
 const { searchClient, clients } = useSearchToSell();
+
 const props = defineProps<{
   total: number;
 }>();
@@ -57,9 +59,11 @@ const handleCreatedClient = (data: Client) => {
 };
 
 const handleCreateShop = async () => {
-  const { success, msg } = await saveSale();
+  const { success, msg, saleId } = await saveSale();
   if (success === false && msg !== "") return toastInfo(msg);
   if (success === true) {
+    console.log(msg);
+    viewReceipt(saleId)
     closeModal();
     resetFormValues();
     toastSuccess(msg);
@@ -142,7 +146,7 @@ const textSaleType = computed(() => {
                 <v-select
                   class="form-control p-0"
                   :options="clients"
-                  :getOptionLabel="(data: ClientToSell) => data.full_name + ' - ' + data.document_number"
+                  :getOptionLabel="(data: ClientToSell) => data.full_name + ' - ' + (data.document_number ?? 'SIN DNI')"
                   :reduce="(data: ClientToSell) => data.id"
                   :clearable="false"
                   v-model="client"

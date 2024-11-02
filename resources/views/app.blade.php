@@ -81,18 +81,17 @@
 </body>
 
 <script type="module">
-  document.addEventListener('DOMContentLoaded', function() {
-    const loadMainScript = () => {
-      const script = document.createElement("script");
-      script.src = "/assets/js/main.js"; // Asegúrate de poner la ruta correcta a tu script
-      script.async = true;
-      script.onload = () => {
-      };
-      document.body.appendChild(script); // Añadimos el script al final del cuerpo del documento
-    };
+    document.addEventListener('DOMContentLoaded', function() {
+        const loadMainScript = () => {
+            const script = document.createElement("script");
+            script.src = "/assets/js/main.js"; // Asegúrate de poner la ruta correcta a tu script
+            script.async = true;
+            script.onload = () => {};
+            document.body.appendChild(script); // Añadimos el script al final del cuerpo del documento
+        };
 
-    loadMainScript();
-  });
+        loadMainScript();
+    });
 </script>
 
 

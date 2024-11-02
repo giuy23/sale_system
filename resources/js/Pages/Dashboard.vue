@@ -8,6 +8,7 @@ import ChartFinalMoneyDay from "@/Components/DailyCashes/ChartFinalMoneyDay.vue"
 import { useDailyCash } from "@/composables/useDailyCash";
 import { useExpense } from "@/composables/useExpense";
 import { useSale } from "@/composables/useSale";
+import SearchByOneDate from "@/Components/common/SearchByOneDate.vue";
 
 const { profit, getProfit } = useDailyCash();
 const { balance, getBalanceToday } = useExpense();
@@ -21,7 +22,6 @@ const getIntialData = async () => {
 };
 
 getIntialData();
-
 </script>
 
 <template>
@@ -35,7 +35,7 @@ getIntialData();
       <div class="col-lg-8 mb-4 order-0">
         <div class="card">
           <div class="d-flex align-items-end row">
-            <div class="col-sm-7">
+            <div class="col-sm-5">
               <div class="card-body">
                 <h5 class="card-title text-primary">
                   Hola {{ $page.props.auth.user.name }}! 🎉
@@ -54,15 +54,16 @@ getIntialData();
                 </div>
               </div>
             </div>
-            <div class="col-sm-5 text-center text-sm-left">
+            <div class="col-sm-7 text-center text-sm-left">
               <div class="card-body pb-0 px-0 px-md-4">
-                <img
+                <SearchByOneDate model="sale" />
+                <!-- <img
                   :src="`storage/images/users/${$page.props.auth.image}`"
                   height="140"
                   alt="User Authenticated"
                   data-app-dark-img="illustrations/man-with-laptop-dark.png"
                   data-app-light-img="illustrations/man-with-laptop-light.png"
-                />
+                /> -->
               </div>
             </div>
           </div>
@@ -77,7 +78,11 @@ getIntialData();
                   class="card-title d-flex align-items-start justify-content-between"
                 >
                   <div class="avatar flex-shrink-0">
-                    <img src="/assets/img/icons/unicons/cc-primary.png" alt="chart success" class="rounded" />
+                    <img
+                      src="/assets/img/icons/unicons/cc-primary.png"
+                      alt="chart success"
+                      class="rounded"
+                    />
                   </div>
                   <!-- <div class="dropdown">
                     <button
@@ -117,7 +122,11 @@ getIntialData();
                   class="card-title d-flex align-items-start justify-content-between"
                 >
                   <div class="avatar flex-shrink-0">
-                    <img src="/assets/img/icons/unicons/wallet-info.png" alt="Credit Card" class="rounded" />
+                    <img
+                      src="/assets/img/icons/unicons/wallet-info.png"
+                      alt="Credit Card"
+                      class="rounded"
+                    />
                   </div>
                 </div>
                 <span class="fw-semibold d-block mb-1"
@@ -145,7 +154,11 @@ getIntialData();
                   class="card-title d-flex align-items-start justify-content-between"
                 >
                   <div class="avatar flex-shrink-0">
-                    <img src="/assets/img/icons/unicons/cc-success.png" alt="Credit Card" class="rounded" />
+                    <img
+                      src="/assets/img/icons/unicons/cc-success.png"
+                      alt="Credit Card"
+                      class="rounded"
+                    />
                   </div>
                 </div>
                 <span class="fw-semibold d-block mb-1">Ingresos de Hoy</span>
@@ -162,7 +175,11 @@ getIntialData();
                   class="card-title d-flex align-items-start justify-content-between"
                 >
                   <div class="avatar flex-shrink-0">
-                    <img src="/assets/img/icons/unicons/cc-warning.png" alt="Credit Card" class="rounded" />
+                    <img
+                      src="/assets/img/icons/unicons/cc-warning.png"
+                      alt="Credit Card"
+                      class="rounded"
+                    />
                   </div>
                 </div>
                 <span class="fw-semibold d-block mb-1">Egresos de Hoy</span>

@@ -1,6 +1,9 @@
 import { DailyCash, DailyCashCreate, DailyCashCompare } from "@/types";
 import axios from "axios";
 import { ref } from "vue";
+import { useSearch } from "./useSearch";
+
+const { searchData, getDate, getDatoToStorage } = useSearch();
 
 export function useDailyCash() {
   const loading = ref(false);
@@ -70,6 +73,36 @@ export function useDailyCash() {
     }
   };
 
+  const exportData = async (type: string, storage: string) => {
+    await getDatoToStorage(storage);
+    try {
+      const response = await axios({
+        url: `${route("dailyCash.export")}?type=${type}`,
+        responseType: "blob",
+        params: { ...searchData },
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      const dateStr = getDate();
+
+      if (type === "excel") {
+        link.setAttribute("download", `reporte-de-caja-${dateStr}.xlsx`);
+      } else if (type === "pdf") {
+        link.setAttribute("download", `reporte-de-caja-${dateStr}.pdf`);
+      }
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      return { success: true };
+    } catch (error) {
+      return { success: false };
+    }
+  };
+
   return {
     loading,
     profit,
@@ -78,5 +111,6 @@ export function useDailyCash() {
     changeStateDailyCash,
     getLastDailyCashes,
     getProfit,
+    exportData,
   };
 }

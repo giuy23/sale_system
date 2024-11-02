@@ -11,6 +11,9 @@ const props = defineProps<{
   saleDetails: GetDataWithParams;
 }>();
 
+console.log(props.saleDetails);
+
+
 watch(
   props.saleDetails,
   (value) => {

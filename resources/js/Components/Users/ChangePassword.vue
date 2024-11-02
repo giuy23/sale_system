@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { ref, computed } from "vue";
 import { useUser } from "@/composables/useUser";
+import { useTypeInput } from "@/composables/useTypeInput";
 
 const { updatePassword, loading } = useUser();
-
+const { inputValue, typeInput } = useTypeInput();
 const emits = defineEmits<{
   updated: [void];
 }>();
@@ -14,23 +14,12 @@ const form = {
   password_confirmation: "",
 };
 
-const inputValue = ref([true, true, true]);
 const hanleUpdatePassword = async () => {
   const { success, data } = await updatePassword({ ...form });
   if (success) {
     emits("updated");
   }
 };
-
-const typeInput = computed(() => (value: boolean) => {
-  let type = "password";
-  let icon = "bx bx-hide";
-  if (!value) {
-    type = "text";
-    icon = "bx bx-show";
-  }
-  return { type, icon };
-});
 </script>
 
 <template>

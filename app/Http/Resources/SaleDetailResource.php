@@ -23,7 +23,7 @@ class SaleDetailResource extends JsonResource
       'discount' => floatval($this->discount),
       'total' => floatval($this->total),
       'created_at' => $this->created_at,
-      'product_name' => $this->product->name ?? 'PRODUCTO NO ENCONTRADO',
+      'product_name' => $this->product->name ?? 'PRODUCTO ElIMINADO',
     ];
   }
 }

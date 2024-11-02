@@ -8,6 +8,7 @@ const props = defineProps<{
 
 const emits = defineEmits<{
   cancel: [number];
+  export: [string];
 }>();
 
 const cancelSale = (id: number) => {
@@ -27,11 +28,51 @@ const state = computed(() => (value: number) => {
   }
   return tag;
 });
+
+const handleExport = (type: string) => {
+  emits("export", type);
+};
 </script>
 
 <template>
   <div class="card">
-    <h5 class="card-header">Striped rows</h5>
+    <div class="row">
+      <div class="col-6">
+        <h5 class="card-header">Striped rows</h5>
+      </div>
+      <div class="col-6 d-flex justify-content-end align-items-center px-4">
+        <div class="btn-group" id="dropdown-icon-demo">
+          <button
+            type="button"
+            class="btn btn-primary dropdown-toggle"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            <i class="bx bx-menu"></i> Exportar
+          </button>
+          <ul class="dropdown-menu">
+            <li>
+              <a
+                @click="handleExport('excel')"
+                class="dropdown-item d-flex align-items-center"
+                ><i class="bx bx-chevron-right scaleX-n1-rtl"></i>Excel</a
+              >
+            </li>
+            <!-- <li>
+              <hr class="dropdown-divider" />
+            </li> -->
+            <li>
+              <a
+                @click="handleExport('pdf')"
+                class="dropdown-item d-flex align-items-center"
+                ><i class="bx bx-chevron-right scaleX-n1-rtl"></i>PDF</a
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
     <div class="table-responsive text-nowrap">
       <table class="table table-striped">
         <thead>
@@ -72,12 +113,13 @@ const state = computed(() => (value: number) => {
                     v-if="sale.state === 1"
                     class="dropdown-item"
                     type="button"
-                    :href="route('sale.detail', sale.id)"
+                    :href="route('saleDetail.index', { id: sale.id })"
                     ><i class="bx bx-edit-alt me-1"></i> Anular Venta</a
                   >
                   <a
                     class="dropdown-item"
-                    type="button" target="_blank"
+                    type="button"
+                    target="_blank"
                     :href="route('sale.detailSale', sale.id)"
                     ><i class="bx bx-edit-alt me-1"></i> Ver Detalles</a
                   >

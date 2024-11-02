@@ -37,7 +37,7 @@ const deleteCategory = (id: number) => {
               <i class="fab fa-angular fa-lg text-danger me-3"></i>
               <strong>{{ category.name }}</strong>
             </td>
-            <td>{{ category.description }}</td>
+            <td class="cell_description">{{ category.description }}</td>
             <td>
               <div class="dropdown">
                 <button
@@ -72,4 +72,6 @@ const deleteCategory = (id: number) => {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+
+</style>

@@ -26,7 +26,7 @@ class ProductRequest extends FormRequest
             'description' => ['nullable', 'string'],
             'purchase_price' => ['numeric', 'numeric', 'min:0'],
             'sale_price' => ['numeric', 'numeric', 'min:0'],
-            'bar_code' => ['required', 'string', 'unique:products,bar_code,'. $this->id],
+            'bar_code' => ['nullable', 'string', 'unique:products,bar_code,'. $this->id],
             'quantity' => ['required', 'integer'],
             'minimum_quantity' => ['nullable', 'integer'],
             'provider_id' => ['required', 'integer', 'min:1' ],

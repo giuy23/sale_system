@@ -30,7 +30,6 @@ const createCashSale = async () => {
         client_id: client.value,
       },
     });
-    console.log(data);
 
     return { success: true, data };
   } catch (error) {
@@ -64,12 +63,14 @@ const createCreditSale = async () => {
   }
 };
 
-const viewReceipt = (url: string) => {
-  const pdfWindow = window.open(url, "_blank");
+const viewReceipt = (saleId: number | null) => {
+  if (saleId === null) return;
+  const pdfWindow = window.open(route("sale.detailSale", saleId), "_blank");
   pdfWindow!.onload = function () {
     pdfWindow!.print();
   };
 };
+// DEVOLVER LA URL CUANDO SE HIZO BIEN
 
 const resetFormValues = () => {
   products.value = [];
@@ -128,11 +129,13 @@ export function shop() {
   };
 
   const saveSale = async () => {
-    const response = { success: true, msg: "" };
+    const response = { success: true, msg: "", saleId: null };
 
     if (saleType.value === 1) {
       const { success, data } = await createCashSale();
-      !success ? (response.success = false) : (response.msg = data.message);
+      !success
+        ? (response.success = false)
+        : ((response.msg = data.message), (response.saleId = data.sale_id));
     } else {
       if (client.value === 1) {
         response.success = false;
@@ -140,7 +143,9 @@ export function shop() {
         return response;
       }
       const { success, data } = await createCreditSale();
-      !success ? (response.success = false) : (response.msg = data.message);
+      !success
+        ? (response.success = false)
+        : ((response.msg = data.message), (response.saleId = data.sale_id));
     }
     return response;
   };
@@ -160,5 +165,6 @@ export function shop() {
     saveSale,
     deleteProductToForm,
     resetFormValues,
+    viewReceipt,
   };
 }

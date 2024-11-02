@@ -17,7 +17,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->decimal('purchase_price', 8,2);
             $table->decimal('sale_price', 8,2);
-            $table->string('bar_code', 21);
+            $table->string('bar_code', 21)->nullable();
             $table->smallInteger('quantity');
             $table->smallInteger('minimum_quantity')->default(1);
             $table->boolean('state')->default(1)->comment('[1=>activo, 0=>inactivo]');

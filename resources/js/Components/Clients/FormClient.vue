@@ -33,7 +33,7 @@ watch(
 const initialClient: Client = {
   id: 0,
   full_name: "",
-  document_number: 0,
+  document_number: null,
   cell_phone: null,
 };
 
@@ -104,15 +104,13 @@ const handleUpdateClient = async () => {
               />
             </div>
             <div class="col-12 mb-3">
-              <label for="document_number" class="form-label">DNI*</label>
+              <label for="document_number" class="form-label">DNI</label>
               <input
-                type="number"
+                type="text"
                 id="document_number"
                 class="form-control"
                 placeholder="Escriba el nombre"
                 v-model="clientForm.document_number"
-                min="0"
-                required
               />
             </div>
             <div class="col-12 mb-3">

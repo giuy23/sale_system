@@ -54,8 +54,7 @@ const state = computed(() => (value: boolean) => {
         </thead>
         <tbody class="table-border-bottom-0">
           <tr v-for="product in products">
-            <td>
-              <i class="fab fa-angular fa-lg text-danger me-3"></i>
+            <td class="cell_name">
               <strong>{{ product.name }}</strong>
             </td>
             <td>{{ product.bar_code }}</td>

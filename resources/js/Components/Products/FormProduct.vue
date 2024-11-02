@@ -195,14 +195,13 @@ const handleInputOneImage = (e: Event) => {
               />
             </div>
             <div class="col-12 col-md-6 mb-3">
-              <label for="bar_code" class="form-label">Código de barras*</label>
+              <label for="bar_code" class="form-label">Código de barras</label>
               <input
                 type="text"
                 id="bar_code"
                 class="form-control"
                 placeholder="Escriba el nombre"
                 v-model="productForm.bar_code"
-                required
               />
             </div>
             <div class="col-12 mb-3">

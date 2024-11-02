@@ -4,17 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\ClientSaleCreditResource;
 use App\Http\Resources\CreditSaleResource;
+use App\Http\Services\DailyCashService;
 use App\Http\Services\PayDebtService;
 use App\Models\Client;
 use App\Models\CreditSale;
 use App\Models\Sale;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class CreditSaleController extends Controller
 {
   public function __construct(
     private PayDebtService $payDebtService,
+    private DailyCashService $dailyCashService,
   ) {
   }
   /**
@@ -75,11 +78,30 @@ class CreditSaleController extends Controller
   {
     $request = $request->validate(['amount' => ['required', 'numeric', 'min:0']]);
     $amount = $request['amount'];
+    $dailyCashCurrent = $this->dailyCashService->searchDailyCashCurrent();
 
-    $this->payDebtService->createPaymentHistory($creditSale->id, $amount);
-    $this->payDebtService->updateAmountRemaining($creditSale, $amount);
+    if (!$dailyCashCurrent) {
+      return response()->json(['message' => 'No hay una Caja abierta. Abra una caja'], 404);
+    }
 
-    return response()->json([], 200);
+    try {
+      DB::beginTransaction();
+
+      // Llamar al método para crear el historial de pago
+      $this->payDebtService->createPaymentHistory($creditSale->id, $amount);
+
+      // Llamar al método para actualizar el saldo restante
+      $this->payDebtService->updateAmountRemaining($creditSale, $amount);
+
+      DB::commit();
+
+      // Devolver una respuesta JSON al cliente
+      return response()->json(['message' => 'Pago exitoso'], 200);
+    } catch (\Exception $e) {
+      DB::rollback();
+      // Manejar cualquier error aquí
+      return response()->json(['error' => 'Error en el pago: ' . $e->getMessage()], 500);
+    }
   }
 
   public function payAllDebts(Request $request)
@@ -87,9 +109,21 @@ class CreditSaleController extends Controller
     $request = $request->validate([
       'creditSaleIds.*.id' => ['required', 'integer'],
     ]);
-    $creditSaleIds = $request['creditSaleIds'];
 
-    $this->payDebtService->cancelAllDebts($creditSaleIds);
+    $dailyCashCurrent = $this->dailyCashService->searchDailyCashCurrent();
+    if (!$dailyCashCurrent) {
+      return response()->json(['message' => 'No hay una Caja abierta. Abra una caja'], 404);
+    }
+
+    $creditSaleIds = $request['creditSaleIds'];
+    try {
+      DB::beginTransaction();
+      $this->payDebtService->cancelAllDebts($creditSaleIds);
+      DB::commit();
+    } catch (\Exception $e) {
+      DB::rollback();
+      return response()->json(['error' => 'Error en el pago: ' . $e->getMessage()], 500);
+    }
 
     return response()->json([], 200);
   }

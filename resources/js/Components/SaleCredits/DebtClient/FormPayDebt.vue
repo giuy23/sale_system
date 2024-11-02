@@ -9,6 +9,8 @@ const props = defineProps<{
 }>();
 
 watch(props.debt, (value) => {
+  console.log(value);
+
   Object.assign(debtForm, value);
 });
 
@@ -47,12 +49,8 @@ const handleSavePayment = async () => {
   );
 
   if (isConfirmed) {
-    console.log("xd");
-
     const { success } = await payDebtForTheSale(debtForm);
     if (success) {
-      console.log(success);
-
       emits("update", { ...debtForm });
     }
   } else {

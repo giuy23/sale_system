@@ -1,6 +1,9 @@
 import axios from "axios";
 import { ref } from "vue";
+import { useSearch } from "./useSearch";
+import { SearchByDate } from "@/types";
 
+const { searchData, getDate, getDatoToStorage } = useSearch();
 export function useSale() {
   const loading = ref(false);
   const totalSalesToday = ref<number>();
@@ -62,14 +65,79 @@ export function useSale() {
         method: "GET",
         url: route("sale.totalSales"),
       });
-      console.log(data);
-
       totalSalesToday.value = data;
       return { success: true };
     } catch (error) {
       return { success: false };
     } finally {
       loading.value = false;
+    }
+  };
+
+  const exportData = async (type: string, storage: string) => {
+    await getDatoToStorage(storage);
+    try {
+      const response = await axios({
+        url: `${route("sale.export")}?type=${type}`,
+        responseType: "blob",
+        params: { ...searchData },
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      const dateStr = getDate();
+
+      if (type === "excel") {
+        link.setAttribute("download", `reporte-de-venta-${dateStr}.xlsx`);
+      } else if (type === "pdf") {
+        link.setAttribute("download", `reporte-de-venta-${dateStr}.pdf`);
+      }
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      return { success: true };
+    } catch (error) {
+      return { success: false };
+    }
+  };
+
+  const exportDataReportDailySales = async (
+    type: string,
+    payload: SearchByDate
+  ) => {
+    try {
+      const response = await axios({
+        url: `${route("sale.export")}?type=${type}`,
+        responseType: "blob",
+        params: { ...payload },
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+
+      if (type === "excel") {
+        link.setAttribute(
+          "download",
+          `reporte-del-dia-${payload.start_date}.xlsx`
+        );
+      } else if (type === "pdf") {
+        link.setAttribute(
+          "download",
+          `reporte-del-dia-${payload.start_date}.pdf`
+        );
+      }
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      return { success: true };
+    } catch (error) {
+      return { success: false };
     }
   };
 
@@ -81,5 +149,8 @@ export function useSale() {
     payDebtForTheSale,
     payAllDebts,
     getTotalAmountToday,
+    exportData,
+    exportDataReportDailySales,
+    getDatoToStorage,
   };
 }

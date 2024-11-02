@@ -60,13 +60,17 @@ class ClientController extends Controller
 
   public function destroy(Client $client)
   {
-    $idClient = $client->id;
-    if ($idClient === 1) {
-      return response()->json([], 403);
+    $debts = $client->debts()->where('is_paid', 0)->count();
+
+    if ($debts > 0) {
+      return response()->json(['message' => 'El usuario tiene deudas pendientes, no se puede eliminar'], 404);
+    }
+
+    if ($client->id === 1) {
+      return response()->json(['message' => 'No tienes permiso para eliminar este cliente'], 403);
     }
 
     $client->delete();
-
     return response()->json(['success' => true]);
   }
 
